@@ -57,3 +57,58 @@ experiences:
       - "AWS, Splunk, CrowdStrike, FTK, Volatility, SIFT, Yara, McAfee, Burp Suite Pro, Kali Linux, Metasploit, Qualys, Tenable Nessus, ThreatStream, Jira, ServiceNow, VCenter, O365, Python, PowerShell"
     standards:
       - "GDPR"
+
+  - position: "Threat Exposure Manager"
+    company: "Uptake Inc."
+    location: "Chicago, IL"
+    start_date: "06/2015"
+    end_date: "06/2018"
+    description: "Directed frontline IR and SIEM modernization, cutting response time −40% while strengthening cloud frameworks, proactive detections, and coverage across network and endpoints."
+    accomplishments:
+      - "Led enterprise IR and optimized SIEM rules and pipelines, −40% response time"
+      - "Engineered cloud security frameworks and logging for improved visibility and detections"
+      - "Conducted pen testing and vuln remediation for critical exposures"
+      - "Mentored teams on attacker TTPs and DFIR methods to elevate readiness"
+      - "Deployed and integrated security tooling across endpoints, network, and edge"
+      - "Ran tabletop exercises and authored playbooks to standardize incident handling"
+      - "Established vendor relationships and deployed all critical security infrastructure"
+    tools:
+      - "Splunk, Elastic, Logstash, Zabbix, Carbon Black, Bitdefender, Sophos, Proofpoint, Palo Alto, Imperva WAF, Nexpose, Kenna, Qualys, Tenable Nessus, AWS, Cloudflare, Threat Stack, Nutanix, Thinkst Canary, Cybereason, Niddel, ProtectWise, Centrify, DUO, Onelogin, Jira, Confluence, PagerDuty, VictorOps, Windows, Linux, macOS, Jamf, Intune, Kace"
+    standards:
+      - "NIST, CIS, ISO 27001"
+
+  - position: "Security Analyst"
+    company: "Cleverbridge Inc."
+    location: "Chicago, IL"
+    start_date: "06/2010"
+    end_date: "06/2015"
+    description: "Led network security and IR for Chicago operations, achieving −25% incidents and −20% human‑error events via PCI‑aligned controls, proactive scanning, and training‑driven risk reduction."
+    accomplishments:
+      - "Engineered network security controls, IR protocols, and PCI/NIST/CIS policies; −25% incidents"
+      - "Performed vuln assessments, PCI audits, and vendor reviews to 100% PCI compliance"
+      - "Built monitoring, IDS rule reviews, VPN cert lifecycle, and production observability"
+      - "Drove server hardening, Wi‑Fi scans, and advisory tracking to minimize attack surface"
+      - "Delivered security awareness programs and workshops, −20% human‑error incidents"
+      - "Collaborated with NetOps globally on segmentation and triage efficiency"
+    tools:
+      - "Snort, Squid Proxy, OpenVPN, OpenVAS, Packet Filter, Zabbix, Malwarebytes, Netgear, Dell, Extreme Networks, Ubiquiti, Bind, Zimbra, Windows, Linux, FreeBSD"
+    standards:
+      - "PCI/DSS, NIST, CIS"
+
+   - position: "Network Engineer"
+    company: "OnShore Networks Inc."
+    location: "Chicago, IL"
+    start_date: "2008"
+    end_date: "2010"
+    description: "Built and secured multi‑site ISP networks across 97 locations for ~9,000 users, delivering encrypted Wi‑Fi and VPN, PTP/PTMP wireless, and hardened routing to reduce attack surface and improve reliability and compliance."
+    accomplishments:
+      - "Designed and operated secure Cable/DSL/Ethernet and wireless backhaul across 97 sites"
+      - "Implemented encrypted Wi‑Fi, VPN, and segmented architectures to prevent unauthorized access"
+      - "Delivered Level‑2 ISP support, audits, and RCA to harden resilience and reduce downtime"
+      - "Deployed multi‑vendor routers, switches, APs, and phone gateways with secure configs"
+      - "Engineered PTP/PTMP wireless (IEEE 802.11a, proprietary 60GHz) to improve throughput and security"
+      - "Produced infrastructure documentation and segmentation to shrink attack surface"
+    tools:
+      - "Cisco, Ubiquiti, Mikrotik, Extreme Networks, Allied, Overture, Versa Technology, OpenVPN, Squid Proxy, Mediatrix, Windows, Linux"
+    standards:
+      - "NIST, CIS"     
