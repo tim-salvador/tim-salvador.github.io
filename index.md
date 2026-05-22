@@ -119,7 +119,7 @@ title: Home
     <hr class="section-divider">
     <div class="timeline-container">
       {% for experience in site.data.experience.experiences %}
-      <details class="exp timeline-{% cycle 'left', 'right' %}" open>
+      <details class="exp timeline-{% cycle 'left', 'right' %}">
         <summary>
           <div class="subheading">
             <div>
