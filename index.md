@@ -12,7 +12,7 @@ title: Home
           <a href="mailto:{{ site.email }}" title="Email Tim">{{ site.email }}</a>
         </div>
         <div class="hero" role="region" aria-label="Intro">
-          <p class="mb-2">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and all things technical. I build pragmatic detection systems, response playbooks, and mentor teams to navigate complex security challenges.</p>
+          <p class="mb-2">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and all things technical. I build pragmatic detection systems, response playbooks,[...]
           <div class="mt-2">
             <a href="#experience" class="btn btn-primary me-2" title="See selected impact">See impactful value</a>
           </div>
@@ -131,11 +131,33 @@ title: Home
         </summary>
         <div class="mt-2">
           <p>{{ experience.description }}</p>
+          
+          {% if experience.accomplishments %}
+          <h4>Achievements</h4>
           <ul>
-            {% for highlight in experience.highlights %}
-            <li>{{ highlight }}</li>
+            {% for accomplishment in experience.accomplishments %}
+            <li>{{ accomplishment }}</li>
             {% endfor %}
           </ul>
+          {% endif %}
+          
+          {% if experience.tools %}
+          <h4>Tools</h4>
+          <ul>
+            {% for tool in experience.tools %}
+            <li>{{ tool }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          
+          {% if experience.standards %}
+          <h4>Standards</h4>
+          <ul>
+            {% for standard in experience.standards %}
+            <li>{{ standard }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
         </div>
       </details>
       {% endfor %}
