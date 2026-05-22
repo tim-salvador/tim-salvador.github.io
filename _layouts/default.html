@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include head.html %}
+</head>
+<body id="page-top" class="theme-light">
+  <a href="#about" class="sr-only">Skip to content</a>
+
+  <!-- Theme Toggle Button -->
+  <button class="theme-toggle btn btn-outline-secondary position-fixed top-0 end-0 m-3" aria-label="Toggle theme">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  {% include navbar.html %}
+
+  <div class="container-fluid p-0">
+    {{ content }}
+  </div>
+
+  {% include footer.html %}
+
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55ODKM0R8S6dM02ecmMrnmRmO" crossorigin="anonymous"></script>
+  
+  <!-- Custom JS -->
+  <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+</body>
+</html>

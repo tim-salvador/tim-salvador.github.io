@@ -1,0 +1,30 @@
+# Education and certifications
+
+education:
+  - degree: "Bachelor of Science"
+    field: "Computer Science"
+    school: "University (Name)"
+    year: "2016"
+    description: "Foundational knowledge in computer science, networking, and security principles"
+
+certifications:
+  - name: "Offensive Security Certified Professional (OSCP)"
+    issuer: "Offensive Security"
+    year: "2024"
+    credential_url: "https://www.credential.net/1526af2c-7746-4712-9c36-6b3cdd0fc15a"
+    badge: "badge-oscp.png"
+    description: "Advanced hands-on penetration testing and security testing certification"
+
+  - name: "GIAC Certified Forensic Analyst (GCFA)"
+    issuer: "GIAC"
+    year: "2023"
+    credential_url: "https://www.credly.com/badges/c3b61008-5db5-4e5a-8576-c2c7715bb4e6"
+    badge: "badge-gcfa.png"
+    description: "Digital forensics and incident response expert certification"
+
+  - name: "AWS Certified Cloud Practitioner"
+    issuer: "Amazon Web Services"
+    year: "2023"
+    credential_url: "https://cp.certmetrics.com/amazon/en/public/verify/credential/1H4EGBXKEMVEQG5W"
+    badge: "badge-awsCP.png"
+    description: "Cloud computing fundamentals and AWS services expertise"

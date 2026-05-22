@@ -1,0 +1,38 @@
+# Notable projects and initiatives
+
+projects:
+  - title: "SOC Modernization Initiative"
+    description: "Led comprehensive redesign of security operations center infrastructure"
+    duration: "2023-2024"
+    impact: |
+      - Implemented new SIEM platform with 40% improved performance
+      - Automated routine tasks reducing manual work by 60%
+      - Trained team of 15 analysts on new tools and processes
+      - Reduced alert fatigue by 75% through intelligent tuning
+
+  - title: "Threat Hunting Program Development"
+    description: "Established proactive threat hunting capability from ground zero"
+    duration: "2022-2023"
+    impact: |
+      - Created hunting playbooks for 10 major threat actors
+      - Identified 25+ previously undetected security incidents
+      - Discovered lateral movement attempts before exploitation
+      - Trained 8 analysts in threat hunting methodologies
+
+  - title: "Network Segmentation & Zero Trust"
+    description: "Designed and implemented zero trust architecture across enterprise"
+    duration: "2021-2023"
+    impact: |
+      - Segmented network into 12 security zones
+      - Reduced lateral movement risk by 85%
+      - Achieved microsegmentation for critical assets
+      - Implemented continuous verification policies
+
+  - title: "Cloud Security Posture Management"
+    description: "Implemented CSPM solution for multi-cloud environment"
+    duration: "2022"
+    impact: |
+      - Identified and remediated 150+ cloud misconfigurations
+      - Achieved 95% compliance with CIS Cloud benchmarks
+      - Automated compliance monitoring and reporting
+      - Reduced cloud security remediation time by 70%

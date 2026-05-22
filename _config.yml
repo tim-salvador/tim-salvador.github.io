@@ -1,0 +1,53 @@
+# Jekyll site configuration
+title: Tim Salvador
+description: Cybersecurity leader specializing in DFIR, Threat Intelligence, SOC engineering, and cloud security. OSCP, GCFA.
+baseurl: ""
+url: "https://tim-salvador.github.io"
+author: Tim Salvador
+email: getintouch@timsalvador.com
+github_username: tim-salvador
+linkedin_username: tim-salvador
+twitter_username: timsalvador
+
+# Build settings
+theme: jekyll-theme-minimal
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Markdown processor
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+# Exclude from processing
+exclude:
+  - .gitignore
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+
+# Include in processing
+include:
+  - _pages
+
+# Collections
+collections:
+  blog:
+    output: true
+    permalink: /blog/:title/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+  - scope:
+      path: ""
+      type: blog
+    values:
+      layout: post

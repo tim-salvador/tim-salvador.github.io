@@ -1,0 +1,24 @@
+---
+layout: default
+---
+
+<article class="resume-section p-3 p-lg-5 d-flex flex-column fade-in">
+  <div class="my-auto section-wrap anchor">
+    <header>
+      <h1 class="mb-2">{{ page.title }}</h1>
+      <p class="text-muted">
+        <small>Published on {{ page.date | date: "%B %d, %Y" }}</small>
+      </p>
+      <hr class="section-divider">
+    </header>
+    
+    <div class="post-content">
+      {{ content }}
+    </div>
+    
+    <footer class="mt-5">
+      <hr class="section-divider">
+      <p><a href="{{ '/blog' | relative_url }}" class="btn btn-primary">&larr; Back to Blog</a></p>
+    </footer>
+  </div>
+</article>

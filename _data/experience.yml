@@ -1,0 +1,51 @@
+# Professional experience timeline
+
+experiences:
+  - position: "Security Operations Leader"
+    company: "Enterprise Security Organization"
+    location: "Chicago, IL"
+    start_date: "2022"
+    end_date: "Present"
+    description: |
+      Led the transformation and scaling of security operations to enterprise scale:
+      - Scaled SOC operations from scratch to 50+ alerts/day with 80%+ noise reduction
+      - Designed and implemented custom detection rules reducing false positives by 75%
+      - Directed incident response for ransomware, credential theft, and DDoS attacks
+      - Contained critical threats in under 4 hours with zero data exfiltration
+      - Mentored analysts across career stages, guiding progression to senior roles
+    highlights:
+      - "Reduced MTTR by 60% through automation and playbook optimization"
+      - "Achieved 99.9% uptime for critical detection infrastructure"
+      - "Trained and promoted 8+ analysts to leadership positions"
+
+  - position: "Senior Security Engineer"
+    company: "Mid-Market Technology Company"
+    location: "Chicago, IL"
+    start_date: "2019"
+    end_date: "2022"
+    description: |
+      Designed and implemented comprehensive security infrastructure for growing organization:
+      - Architected cloud security posture management (CSPM) solutions
+      - Developed threat hunting program from scratch with 40% detection rate improvement
+      - Implemented network segmentation reducing lateral movement risk by 85%
+      - Led security training and awareness initiatives
+    highlights:
+      - "Completed 12 penetration tests and remediated critical findings"
+      - "Established security metrics and KPIs for executive reporting"
+      - "Mentored junior engineers in incident response procedures"
+
+  - position: "Information Security Analyst"
+    company: "Financial Services Firm"
+    location: "Chicago, IL"
+    start_date: "2016"
+    end_date: "2019"
+    description: |
+      Contributed to security operations and compliance initiatives:
+      - Monitored and analyzed security events in SIEM environment
+      - Conducted vulnerability assessments and assisted with remediation
+      - Documented and enforced security policies and procedures
+      - Supported audit and compliance activities (PCI-DSS, SOC 2)
+    highlights:
+      - "Identified and remediated 200+ vulnerabilities in first year"
+      - "Achieved 100% audit compliance rating for two consecutive years"
+      - "Developed and delivered security awareness training to 500+ employees"

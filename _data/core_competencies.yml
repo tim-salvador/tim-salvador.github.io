@@ -1,0 +1,42 @@
+# Core competencies organized by expertise area
+
+competencies:
+  - area: "Detection Engineering"
+    items:
+      - SIEM Rule Development
+      - Alert Tuning & Optimization
+      - Log Aggregation & Analysis
+      - Threat Modeling
+      - Behavioral Analytics
+
+  - area: "Incident Response"
+    items:
+      - Incident Triage & Analysis
+      - Forensics & Data Collection
+      - Containment & Eradication
+      - Post-Incident Review
+      - Playbook Development
+
+  - area: "Threat Intelligence"
+    items:
+      - IOC Analysis & Correlation
+      - Threat Actor Profiling
+      - Vulnerability Intelligence
+      - MITRE ATT&CK Mapping
+      - Intelligence Integration
+
+  - area: "Cloud Security"
+    items:
+      - Cloud Architecture Review
+      - Misconfiguration Detection
+      - Identity & Access Management
+      - Data Protection
+      - Compliance & Governance
+
+  - area: "Leadership & Operations"
+    items:
+      - Team Management
+      - Process Improvement
+      - Strategic Planning
+      - Vendor Management
+      - Metrics & Reporting

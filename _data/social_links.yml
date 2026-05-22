@@ -1,0 +1,26 @@
+# Social media and professional links
+
+social_links:
+  - platform: "LinkedIn"
+    icon: "fab fa-linkedin"
+    url: "https://www.linkedin.com/in/tim-salvador/"
+    title: "LinkedIn Profile"
+    aria_label: "Visit Tim Salvador on LinkedIn"
+
+  - platform: "GitHub"
+    icon: "fab fa-github"
+    url: "https://github.com/tim-salvador/"
+    title: "GitHub Profile"
+    aria_label: "Visit Tim Salvador on GitHub"
+
+  - platform: "X"
+    icon: "fab fa-x-twitter"
+    url: "https://x.com/timsalvador"
+    title: "X (Twitter) Profile"
+    aria_label: "Visit Tim Salvador on X"
+
+  - platform: "Keybase"
+    icon: "fab fa-keybase"
+    url: "https://keybase.io/tsalvador"
+    title: "Keybase Profile"
+    aria_label: "Visit Tim Salvador on Keybase"

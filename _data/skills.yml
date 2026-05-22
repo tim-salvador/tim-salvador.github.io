@@ -1,0 +1,46 @@
+# Skills organized by category
+
+- category: Security Operations & Incident Response
+  items:
+    - SIEM Administration (Splunk, ELK)
+    - Alert Tuning & Rule Development
+    - Incident Response & Forensics
+    - Threat Hunting
+    - Playbook Development
+    - SOC Process Optimization
+
+- category: Threat Intelligence & Analysis
+  items:
+    - Threat Intelligence Platforms (TIP)
+    - Indicators of Compromise (IOC) Analysis
+    - MITRE ATT&CK Framework
+    - Adversary Profiling
+    - Malware Analysis
+    - Open Source Intelligence (OSINT)
+
+- category: Cloud & Infrastructure Security
+  items:
+    - AWS Security
+    - Cloud Architecture Review
+    - Network Segmentation
+    - Zero Trust Architecture
+    - Identity & Access Management (IAM)
+    - Encryption & Key Management
+
+- category: Technical & Engineering
+  items:
+    - Python Scripting
+    - Bash/Shell Scripting
+    - Windows & Linux Administration
+    - Network Protocols & Analysis
+    - Docker & Container Security
+    - API Security
+
+- category: Leadership & Management
+  items:
+    - Team Building & Mentoring
+    - Process Improvement
+    - Vendor Management
+    - Security Strategy
+    - Stakeholder Communication
+    - Budget & Resource Planning
