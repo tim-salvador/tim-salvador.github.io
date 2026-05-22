@@ -253,7 +253,7 @@ body {
 }
 
 .bubble.open {
-
+  visibility: visible;  
   opacity: 1;
   box-shadow: 0 12px 40px rgba(0,0,0,.15);
 }
@@ -271,7 +271,6 @@ body {
 }
 
 .bubble-close {
-  visibility: visible;  
   background: none;
   border: 0;
   float: right;
