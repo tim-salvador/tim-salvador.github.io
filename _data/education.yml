@@ -1,11 +1,17 @@
 # Education and certifications
 
 education:
+  - degree: "Master of Science"
+    field: "Computer, Information and Network Security (CINS)"
+    school: "DePaul University"
+    year: "2012"
+    description: "Hands-on training in computer security, network defense, and risk management that meets NSA/DHS standards for National Center of Academic Excellence in Cyber Defense (CAE-CD) designation."
+
   - degree: "Bachelor of Science"
-    field: "Computer Science"
-    school: "University (Name)"
-    year: "2016"
-    description: "Foundational knowledge in computer science, networking, and security principles"
+    field: "Telecommunications and Network Management"
+    school: "DeVry University"
+    year: "2006"
+    description: "The curriculum covers operating systems, programming, hardware, connectivity, and security, with a focus on networking and communications management, preparing students for technical and leadership roles in IT infrastructure and telecommunications"
 
 certifications:
   - name: "Offensive Security Certified Professional (OSCP)"
