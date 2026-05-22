@@ -15,11 +15,11 @@ experiences:
       - Directed IR, threat monitoring, and forensics teams; mentored analysts in triage, malware analysis, and threat hunting
       - Conducted risk assessments for new tech and vendors; optimized monitoring pipelines to improve signal-to-noise
       - Delivered executive briefings on major incidents, improving decision velocity and audit readiness
-    Tools: 
+    Tools: |
       -  Azure, Entra ID, O365 Defender, InsightIDR, InsightConnect, KQL/Kusto, PowerBI, Cylance, Threat Command, Cyber Triage, Valimail, Area 1 Security, Microsoft Graph, Teams, PowerShell, Python
-    Standards: 
+    Standards: |
       -  NIST, ISO 27001
-    Highlights:
+    Highlights: |
       - 
 
   - position: "Senior Information Security Manager II"
@@ -36,10 +36,12 @@ experiences:
       - Migrated on‑prem security stack to cloud‑native platforms, reducing costs −80%
       - Streamlined WAF, raising detection accuracy +90% and reducing false positives −75%
       - Ran audits, vendor reviews, and awareness programs, reducing phishing risk −50% and closing gaps
-    Tools:
+    Tools: |
       - AWS, GCP, Azure, Okta, DUO, Nordlayer, Chronicle Backstory, Splunk, Wazuh, OSSEC, SentinelOne, Red Canary, Tenable Nessus, Wiz, Proofpoint, Akamai, Abnormal Security, Palo Alto, Jira, JAMF, G Suite, PagerDuty, GitHub, OpenVPN, Filebeat
-    Standards:
+    Standards: |
       - ISO 27001, NIST, CIS, PCI/DSS
+    Highlights: |
+      - 
 
   - position: "Sr Security Analyst III CSIRT"
     company: "AbbVie Inc."
@@ -55,7 +57,9 @@ experiences:
       - Coordinated GDPR‑compliant audits
       - Authored policies and IR playbooks to standardize response
       - Produced incident reports and briefings using SOC and forensics tooling
-    Tools:
+    Tools: |
       - AWS, Splunk, CrowdStrike, FTK, Volatility, SIFT, Yara, McAfee, Burp Suite Pro, Kali Linux, Metasploit, Qualys, Tenable Nessus, ThreatStream, Jira, ServiceNow, VCenter, O365, Python, PowerShell, Bash, Windows, Linux, iOS, Android
-    Standards:
+    Standards: |
       - GDRP
+    Highlights: |
+      - 
