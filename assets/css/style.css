@@ -368,7 +368,6 @@ details.exp:focus-visible {
 }
 
 .container-fluid {
-  padding-left: max(15%, 250px);
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
@@ -524,6 +523,13 @@ h1, h2, h3, h4 {
   font-family: 'Poppins', sans-serif;
 }
 
+/* Desktop layout - push content right for sidebar */
+@media (min-width: 992px) {
+  .container-fluid {
+    margin-left: 250px;
+  }
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 991.98px) {
   #sideNav {
@@ -559,6 +565,10 @@ h1, h2, h3, h4 {
   
   .fa-stack {
     font-size: 0.9rem;
+  }
+  
+  .container-fluid {
+    margin-left: 0;
   }
 }
 
@@ -631,12 +641,6 @@ h1, h2, h3, h4 {
     width: 100%;
     margin-left: 40px;
     margin-right: 20px;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .container-fluid {
-    padding-left: 0;
   }
 }
 
