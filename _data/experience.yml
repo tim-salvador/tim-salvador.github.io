@@ -1,51 +1,61 @@
 # Professional experience timeline
 
 experiences:
-  - position: "Security Operations Leader"
-    company: "Enterprise Security Organization"
-    location: "Chicago, IL"
-    start_date: "2022"
-    end_date: "Present"
+  - position: "Incident Responder Manager"
+    company: "Illinois Tool Works Inc."
+    location: "Glenview, IL"
+    start_date: "04/2024"
+    end_date: "10/2024"
     description: |
-      Led the transformation and scaling of security operations to enterprise scale:
-      - Scaled SOC operations from scratch to 50+ alerts/day with 80%+ noise reduction
-      - Designed and implemented custom detection rules reducing false positives by 75%
-      - Directed incident response for ransomware, credential theft, and DDoS attacks
-      - Contained critical threats in under 4 hours with zero data exfiltration
-      - Mentored analysts across career stages, guiding progression to senior roles
-    highlights:
-      - "Reduced MTTR by 60% through automation and playbook optimization"
-      - "Achieved 99.9% uptime for critical detection infrastructure"
-      - "Trained and promoted 8+ analysts to leadership positions"
+      Drove enterprise IR, SIEM automation, and threat monitoring across Azure and O365, improving detection accuracy 40%, cutting investigation effort 50%, and reducing response time 30–35%, while maintaining NIST/ISO 27001 alignment and elevating DFIR capabilities.
+      - Automated log monitoring and SIEM workflows, delivering +40% detection accuracy and −50% manual investigation effort
+      - Deployed incident tracking and proactive detections, reducing threat response time by 30–35%
+      - Built NIST 800-61 and ISO 27001 aligned IR playbooks and policies to standardize response and ensure compliance
+      - Enhanced continuous monitoring with InsightIDR and KQL/Kusto to expand cloud and endpoint visibility
+      - Directed IR, threat monitoring, and forensics teams; mentored analysts in triage, malware analysis, and threat hunting
+      - Conducted risk assessments for new tech and vendors; optimized monitoring pipelines to improve signal-to-noise
+      - Delivered executive briefings on major incidents, improving decision velocity and audit readiness
+    Tools: 
+      -  Azure, Entra ID, O365 Defender, InsightIDR, InsightConnect, KQL/Kusto, PowerBI, Cylance, Threat Command, Cyber Triage, Valimail, Area 1 Security, Microsoft Graph, Teams, PowerShell, Python
+    Standards: 
+      -  NIST, ISO 27001
+    Highlights:
+      - 
 
-  - position: "Senior Security Engineer"
-    company: "Mid-Market Technology Company"
+  - position: "Senior Information Security Manager II"
+    company: "Groupon Inc."
     location: "Chicago, IL"
-    start_date: "2019"
-    end_date: "2022"
+    start_date: "03/2020"
+    end_date: "07/2023"
     description: |
-      Designed and implemented comprehensive security infrastructure for growing organization:
-      - Architected cloud security posture management (CSPM) solutions
-      - Developed threat hunting program from scratch with 40% detection rate improvement
-      - Implemented network segmentation reducing lateral movement risk by 85%
-      - Led security training and awareness initiatives
-    highlights:
-      - "Completed 12 penetration tests and remediated critical findings"
-      - "Established security metrics and KPIs for executive reporting"
-      - "Mentored junior engineers in incident response procedures"
+      Led SOC, cloud, and AppSec across endpoints, AWS, and GCP, delivering 35% faster IR, 50% broader detection coverage, 70% posture improvement, 100% ISO 27001/NIST compliance, and 80% cost reduction through cloud migrations.
+      - Directed SOC and DFIR programs; expanded detections +50% and cut MTTR −35%
+      - Engineered security controls and use cases, improving posture +70% with 100% ISO 27001/NIST alignment
+      - Implemented Chronicle Backstory for continuous monitoring across cloud and endpoints
+      - Architected frameworks and risk processes, lowering security downtime −20%
+      - Migrated on‑prem security stack to cloud‑native platforms, reducing costs −80%
+      - Streamlined WAF, raising detection accuracy +90% and reducing false positives −75%
+      - Ran audits, vendor reviews, and awareness programs, reducing phishing risk −50% and closing gaps
+    Tools:
+      - AWS, GCP, Azure, Okta, DUO, Nordlayer, Chronicle Backstory, Splunk, Wazuh, OSSEC, SentinelOne, Red Canary, Tenable Nessus, Wiz, Proofpoint, Akamai, Abnormal Security, Palo Alto, Jira, JAMF, G Suite, PagerDuty, GitHub, OpenVPN, Filebeat
+    Standards:
+      - ISO 27001, NIST, CIS, PCI/DSS
 
-  - position: "Information Security Analyst"
-    company: "Financial Services Firm"
-    location: "Chicago, IL"
-    start_date: "2016"
-    end_date: "2019"
+  - position: "Sr Security Analyst III CSIRT"
+    company: "AbbVie Inc."
+    location: "North Chicago, IL"
+    start_date: "08/2018"
+    end_date: "02/2020"
     description: |
-      Contributed to security operations and compliance initiatives:
-      - Monitored and analyzed security events in SIEM environment
-      - Conducted vulnerability assessments and assisted with remediation
-      - Documented and enforced security policies and procedures
-      - Supported audit and compliance activities (PCI-DSS, SOC 2)
-    highlights:
-      - "Identified and remediated 200+ vulnerabilities in first year"
-      - "Achieved 100% audit compliance rating for two consecutive years"
-      - "Developed and delivered security awareness training to 500+ employees"
+      Led Red, Blue, and Green Team ops and AWS‑based detections to cut resolution time −25%, identify vulns in 95% of systems, and harden posture via AppSec, AV‑evasion testing, and GDPR‑aligned audits.
+      - Ran Red/Blue/Green operations and proactive hunting, reducing resolution time −25%
+      - Drove pen testing and vuln scans with 95% vuln identification and remediation follow‑through
+      - Engineered AWS detections and network traffic analytics to strengthen SOC triage
+      - Performed malware reversing, Wi‑Fi testing, AppSec reviews, and AV‑evasion assessments
+      - Coordinated GDPR‑compliant audits
+      - Authored policies and IR playbooks to standardize response
+      - Produced incident reports and briefings using SOC and forensics tooling
+    Tools:
+      - AWS, Splunk, CrowdStrike, FTK, Volatility, SIFT, Yara, McAfee, Burp Suite Pro, Kali Linux, Metasploit, Qualys, Tenable Nessus, ThreatStream, Jira, ServiceNow, VCenter, O365, Python, PowerShell, Bash, Windows, Linux, iOS, Android
+    Standards:
+      - GDRP
