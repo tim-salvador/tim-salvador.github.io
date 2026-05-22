@@ -12,7 +12,7 @@ title: Home
           <a href="mailto:{{ site.email }}" title="Email Tim">{{ site.email }}</a>
         </div>
         <div class="hero" role="region" aria-label="Intro">
-          <p class="mb-2">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and all things technical. I build pragmatic detection systems, response playbooks,[...]
+          <p class="mb-2">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and all things technical. I build pragmatic detection, response playbooks, and cloud security that scale.
           <div class="mt-2">
             <a href="#experience" class="btn btn-primary me-2" title="See selected impact">See impactful value</a>
           </div>
