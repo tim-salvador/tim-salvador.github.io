@@ -1,6 +1,6 @@
 :root {
-  --accent: #1a73e8;
-  --accent-weak: #e7f0fe;
+  --accent: #0c7489;
+  --accent-weak: #e0f4f7;
   --text: #0b1220;
   --muted: #4b5563;
   --bg: #fff;
@@ -25,7 +25,7 @@ html {
 body {
   color: var(--text);
   background: var(--bg);
-  font-family: 'Roboto', sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 16px;
   margin: 0;
   overflow-x: hidden;
@@ -453,7 +453,7 @@ blockquote {
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 24px;
   font-weight: 700;
   color: var(--accent);
@@ -521,7 +521,7 @@ details.exp.timeline-right::after {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 /* Desktop layout - push content right for sidebar */

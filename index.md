@@ -12,9 +12,9 @@ title: Home
           <a href="mailto:{{ site.email }}" title="Email Tim">{{ site.email }}</a>
         </div>
         <div class="hero" role="region" aria-label="Intro">
-          <p class="mb-2">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and all things technical. I build pragmatic detection, response playbooks, and cloud security that scale.
+          <p class="mb-2">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and all things technical. I build pragmatic detection, response playbooks, and cloud security that scale.</p>
           <div class="mt-2">
-            <a href="#experience" class="btn btn-primary me-2" title="See selected impact">See impactful value</a>
+            <a href="#experience" class="btn btn-primary me-2" title="View my work">View My Work</a>
           </div>
         </div>
       </div>
@@ -189,14 +189,5 @@ title: Home
       <p><a href="{{ cert.credential_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Verify Credential</a></p>
     </div>
     {% endfor %}
-  </div>
-</section>
-
-<hr class="section-divider">
-<section class="resume-section p-3 p-lg-5 d-flex flex-column fade-in" id="blog">
-  <div class="my-auto section-wrap anchor">
-    <h2 class="mb-2"><i class="fas fa-blog me-2"></i> Blog</h2>
-    <hr class="section-divider">
-    <p class="text-muted">Blog posts coming soon. Check back for insights on security operations, incident response, and threat intelligence.</p>
   </div>
 </section>
