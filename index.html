@@ -197,6 +197,34 @@
       max-width: var(--max);
       margin: 0 auto;
       width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 4rem;
+    }
+
+    .hero-text { flex: 1; min-width: 0; }
+
+    .hero-photo {
+      flex-shrink: 0;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 0 8px rgba(34,211,238,.08), 0 0 60px rgba(34,211,238,.12);
+      position: relative;
+    }
+    .hero-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: brightness(.95) saturate(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .hero-inner { flex-direction: column-reverse; gap: 2rem; }
+      .hero-photo { width: 130px; height: 130px; align-self: flex-start; }
     }
 
     .hero-label {
@@ -210,15 +238,6 @@
       align-items: center;
       gap: .75rem;
     }
-    .hero-label::after {
-      content: '';
-      flex: 1;
-      max-width: 80px;
-      height: 1px;
-      background: var(--cyan);
-      opacity: .4;
-    }
-
     .hero-name {
       font-family: var(--mono);
       font-size: clamp(2.8rem, 7vw, 5.5rem);
@@ -253,7 +272,7 @@
     .hero-bio {
       font-size: 1.05rem;
       color: var(--dim);
-      max-width: 560px;
+      max-width: 100%;
       margin-bottom: 2.5rem;
       line-height: 1.75;
     }
@@ -944,31 +963,36 @@
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-inner">
-    <div class="hero-label">Cybersecurity Leader · Chicago, IL</div>
-    <h1 class="hero-name">Tim<br><em>Salvador</em></h1>
-    <div class="hero-title" id="typed-title"><span class="cursor"></span></div>
-    <p class="hero-bio">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and cloud security. I build pragmatic detection, response playbooks, and scalable security programs.</p>
-    <div class="hero-ctas">
-      <a href="#experience" class="btn btn-primary">View My Work</a>
-      <a href="mailto:getintouch@timsalvador.com" class="btn btn-outline">Get in Touch</a>
+    <div class="hero-text">
+      <div class="hero-label">Cybersecurity Leader · Chicago, IL</div>
+      <h1 class="hero-name">Tim<br><em>Salvador</em></h1>
+      <div class="hero-title" id="typed-title"><span class="cursor"></span></div>
+      <p class="hero-bio">Security leader focused on Security Operations, Incident Response, Threat Intelligence, and cloud security. I build pragmatic detection, response playbooks, and scalable security programs.</p>
+      <div class="hero-ctas">
+        <a href="#experience" class="btn btn-primary">View My Work</a>
+        <a href="mailto:getintouch@timsalvador.com" class="btn btn-outline">Get in Touch</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <span class="stat-num">15+</span>
+          <span class="stat-lbl">Years in Security</span>
+        </div>
+        <div>
+          <span class="stat-num">6</span>
+          <span class="stat-lbl">Enterprise Roles</span>
+        </div>
+        <div>
+          <span class="stat-num">3</span>
+          <span class="stat-lbl">Active Certs</span>
+        </div>
+        <div>
+          <span class="stat-num">80%+</span>
+          <span class="stat-lbl">Noise Reduction Achieved</span>
+        </div>
+      </div>
     </div>
-    <div class="hero-stats">
-      <div>
-        <span class="stat-num">15+</span>
-        <span class="stat-lbl">Years in Security</span>
-      </div>
-      <div>
-        <span class="stat-num">6</span>
-        <span class="stat-lbl">Enterprise Roles</span>
-      </div>
-      <div>
-        <span class="stat-num">3</span>
-        <span class="stat-lbl">Active Certs</span>
-      </div>
-      <div>
-        <span class="stat-num">80%+</span>
-        <span class="stat-lbl">Noise Reduction Achieved</span>
-      </div>
+    <div class="hero-photo">
+      <img src="assets/img/profilepic-colored.webp" alt="Tim Salvador">
     </div>
   </div>
 </section>
