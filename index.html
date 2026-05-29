@@ -1651,6 +1651,22 @@
         .map(el => clean(el.textContent.replace(/^\W+/, '')));
       wrap(areas.join('  |  '), ML, TW, 9.5, 'normal', 50, 50, 50, 2);
 
+      // ── TECHNICAL SKILLS ─────────────────────────────────────
+      section('TECHNICAL SKILLS');
+
+      const tabs   = [...document.querySelectorAll('.skill-tab')];
+      const panels = [...document.querySelectorAll('.skill-panel')];
+      panels.forEach((panel, i) => {
+        const label = clean(tabs[i]?.textContent);
+        const chips = [...panel.querySelectorAll('.skill-chip')].map(c => clean(c.textContent)).join(', ');
+        if (!chips) return;
+        guard(22);
+        style(9, 'bold', 40, 40, 40);
+        doc.text(label + ':', ML, y);
+        y += 11;
+        wrap(chips, ML + 6, TW - 6, 9.5, 'normal', 55, 55, 55, 5);
+      });
+
       // ── EXPERIENCE ───────────────────────────────────────────
       section('PROFESSIONAL EXPERIENCE');
 
@@ -1704,22 +1720,6 @@
         }
 
         y += 12;
-      });
-
-      // ── TECHNICAL SKILLS ─────────────────────────────────────
-      section('TECHNICAL SKILLS');
-
-      const tabs   = [...document.querySelectorAll('.skill-tab')];
-      const panels = [...document.querySelectorAll('.skill-panel')];
-      panels.forEach((panel, i) => {
-        const label = clean(tabs[i]?.textContent);
-        const chips = [...panel.querySelectorAll('.skill-chip')].map(c => clean(c.textContent)).join(', ');
-        if (!chips) return;
-        guard(22);
-        style(9, 'bold', 40, 40, 40);
-        doc.text(label + ':', ML, y);
-        y += 11;
-        wrap(chips, ML + 6, TW - 6, 9.5, 'normal', 55, 55, 55, 5);
       });
 
       // ── EDUCATION ────────────────────────────────────────────
