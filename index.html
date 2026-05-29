@@ -969,6 +969,10 @@
       <div class="hero-ctas">
         <a href="#experience" class="btn btn-primary">View My Work</a>
         <a href="mailto:getintouch@timsalvador.com" class="btn btn-outline">Get in Touch</a>
+        <button id="pdf-btn" class="btn btn-outline" onclick="generateResume(this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Resume
+        </button>
       </div>
       <div class="hero-stats">
         <div>
@@ -1544,6 +1548,219 @@
     document.querySelectorAll('.skill-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(panelId).classList.add('active');
+  }
+
+  /* ── PDF Resume Generator ── */
+  async function generateResume(btn) {
+    const origHTML = btn.innerHTML;
+    btn.innerHTML = 'Generating…';
+    btn.disabled = true;
+
+    try {
+      if (!window.jspdf) {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+      const W = doc.internal.pageSize.getWidth();
+      const H = doc.internal.pageSize.getHeight();
+      const ML = 54, MR = 54, MT = 48;
+      const CW = W - ML - MR;
+      let y = MT;
+
+      // ── helpers ──────────────────────────────────────────────
+      function newPageIfNeeded(needed) {
+        if (y + needed > H - MT) { doc.addPage(); y = MT; }
+      }
+
+      function setStyle(size, weight, r, g, b) {
+        doc.setFontSize(size);
+        doc.setFont('helvetica', weight);
+        doc.setTextColor(r, g, b);
+      }
+
+      function writeWrapped(text, indent, size, weight, r, g, b) {
+        setStyle(size, weight, r, g, b);
+        const lh = size * 1.35;
+        const lines = doc.splitTextToSize(text, CW - indent);
+        newPageIfNeeded(lines.length * lh);
+        doc.text(lines, ML + indent, y);
+        y += lines.length * lh;
+      }
+
+      function sectionDivider(title) {
+        y += 12;
+        newPageIfNeeded(22);
+        setStyle(9.5, 'bold', 20, 20, 20);
+        doc.text(title, ML, y);
+        y += 4;
+        doc.setDrawColor(160, 160, 160);
+        doc.setLineWidth(0.75);
+        doc.line(ML, y, W - MR, y);
+        y += 10;
+      }
+
+      // ── NAME & CONTACT ───────────────────────────────────────
+      setStyle(22, 'bold', 15, 15, 15);
+      doc.text('TIM SALVADOR', ML, y);
+      y += 26;
+
+      setStyle(8.5, 'normal', 90, 90, 90);
+      doc.text(
+        'getintouch@timsalvador.com  •  Chicago, IL  •  linkedin.com/in/tim-salvador  •  github.com/tim-salvador',
+        ML, y
+      );
+      y += 5;
+      doc.setDrawColor(180, 180, 180);
+      doc.setLineWidth(0.5);
+      doc.line(ML, y, W - MR, y);
+      y += 14;
+
+      // ── SUMMARY ──────────────────────────────────────────────
+      sectionDivider('PROFESSIONAL SUMMARY');
+      const bio = document.querySelector('.hero-bio')?.textContent.trim() || '';
+      writeWrapped(bio, 0, 9.5, 'normal', 50, 50, 50);
+      y += 2;
+
+      // ── CORE COMPETENCIES ────────────────────────────────────
+      sectionDivider('CORE COMPETENCIES');
+      const areas = [...document.querySelectorAll('.comp-area')]
+        .map(el => el.textContent.replace(/^\W+/, '').trim());
+      writeWrapped(areas.join('  •  '), 0, 9.5, 'normal', 50, 50, 50);
+      y += 2;
+
+      // ── EXPERIENCE ───────────────────────────────────────────
+      sectionDivider('PROFESSIONAL EXPERIENCE');
+
+      document.querySelectorAll('.exp-entry').forEach(entry => {
+        const pos   = entry.querySelector('.exp-pos')?.textContent.trim() || '';
+        const co    = entry.querySelector('.exp-company')?.textContent.trim() || '';
+        const dates = entry.querySelector('.exp-dates')?.textContent.trim() || '';
+        const loc   = entry.querySelector('.exp-loc')?.textContent.trim() || '';
+        const desc  = entry.querySelector('.exp-desc')?.textContent.trim() || '';
+        const lis   = [...entry.querySelectorAll('.exp-list li')];
+        const allPillDivs = [...entry.querySelectorAll('.tool-pills')];
+
+        newPageIfNeeded(64);
+
+        // Role title + date range
+        setStyle(10.5, 'bold', 20, 20, 20);
+        doc.text(pos, ML, y);
+        setStyle(9, 'normal', 110, 110, 110);
+        const dw = doc.getTextWidth(dates);
+        doc.text(dates, W - MR - dw, y);
+        y += 14;
+
+        // Company + location
+        setStyle(9.5, 'normal', 80, 80, 80);
+        doc.text(`${co}  |  ${loc}`, ML, y);
+        y += 13;
+
+        // Description
+        writeWrapped(desc, 0, 9.5, 'normal', 50, 50, 50);
+        y += 4;
+
+        // Achievements
+        if (lis.length) {
+          setStyle(9.5, 'bold', 30, 30, 30);
+          doc.text('Key Achievements', ML, y);
+          y += 12;
+          lis.forEach(li => {
+            writeWrapped('•  ' + li.textContent.trim(), 6, 9.5, 'normal', 50, 50, 50);
+          });
+          y += 2;
+        }
+
+        // Toolchain (first .tool-pills block)
+        if (allPillDivs[0]) {
+          const tools = [...allPillDivs[0].querySelectorAll('.tool-pill')]
+            .map(p => p.textContent.trim()).join(', ');
+          if (tools) writeWrapped('Tools: ' + tools, 0, 8.5, 'normal', 100, 100, 100);
+        }
+
+        // Standards (last .tool-pills block, when there are 2+)
+        if (allPillDivs.length >= 2) {
+          const stds = [...allPillDivs[allPillDivs.length - 1].querySelectorAll('.tool-pill')]
+            .map(p => p.textContent.trim()).join(', ');
+          if (stds) writeWrapped('Standards: ' + stds, 0, 8.5, 'normal', 100, 100, 100);
+        }
+
+        y += 12;
+      });
+
+      // ── SKILLS ───────────────────────────────────────────────
+      sectionDivider('TECHNICAL SKILLS');
+
+      const tabs   = [...document.querySelectorAll('.skill-tab')];
+      const panels = [...document.querySelectorAll('.skill-panel')];
+      panels.forEach((panel, i) => {
+        const label = tabs[i]?.textContent.trim() || '';
+        const chips = [...panel.querySelectorAll('.skill-chip')]
+          .map(c => c.textContent.trim()).join(', ');
+        if (!chips) return;
+        setStyle(9.5, 'bold', 40, 40, 40);
+        newPageIfNeeded(22);
+        doc.text(label + ':', ML, y);
+        y += 12;
+        writeWrapped(chips, 8, 9.5, 'normal', 60, 60, 60);
+        y += 5;
+      });
+
+      // ── EDUCATION ────────────────────────────────────────────
+      sectionDivider('EDUCATION');
+
+      document.querySelectorAll('.edu-card').forEach(card => {
+        const degree = card.querySelector('.edu-degree')?.textContent.trim() || '';
+        const field  = card.querySelector('.edu-field')?.textContent.trim() || '';
+        const school = card.querySelector('.edu-school')?.textContent.trim() || '';
+        const yr     = card.querySelector('.edu-year')?.textContent.trim() || '';
+        const descEl = card.querySelector('.edu-desc')?.textContent.trim() || '';
+
+        newPageIfNeeded(50);
+        setStyle(10, 'bold', 20, 20, 20);
+        doc.text(`${degree} in ${field}`, ML, y);
+        setStyle(9, 'normal', 110, 110, 110);
+        doc.text(yr, W - MR - doc.getTextWidth(yr), y);
+        y += 13;
+        setStyle(9.5, 'normal', 70, 70, 70);
+        doc.text(school, ML, y);
+        y += 12;
+        writeWrapped(descEl, 0, 9, 'normal', 90, 90, 90);
+        y += 8;
+      });
+
+      // ── CERTIFICATIONS ───────────────────────────────────────
+      sectionDivider('CERTIFICATIONS');
+
+      document.querySelectorAll('.cert-card').forEach(card => {
+        const name   = card.querySelector('.cert-name')?.textContent.trim() || '';
+        const issuer = card.querySelector('.cert-issuer')?.textContent.trim() || '';
+        const cdesc  = card.querySelector('.cert-desc')?.textContent.trim() || '';
+        newPageIfNeeded(36);
+        setStyle(9.5, 'bold', 20, 20, 20);
+        doc.text('•  ' + name, ML + 4, y);
+        y += 12;
+        setStyle(9, 'normal', 90, 90, 90);
+        doc.text(issuer, ML + 12, y);
+        y += 11;
+        writeWrapped(cdesc, 12, 9, 'normal', 110, 110, 110);
+        y += 4;
+      });
+
+      doc.save('Tim_Salvador_Resume.pdf');
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('Could not generate PDF. Please try again.');
+    } finally {
+      btn.innerHTML = origHTML;
+      btn.disabled = false;
+    }
   }
 </script>
 </body>
