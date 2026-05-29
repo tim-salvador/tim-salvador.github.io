@@ -654,7 +654,6 @@
       transition: max-height .4s ease, padding .3s ease;
     }
     .exp-entry.open .exp-body {
-      max-height: 800px;
       padding: 1.25rem 1.5rem;
     }
 
@@ -1525,9 +1524,19 @@
   /* ── Experience accordion ── */
   function toggleExp(header) {
     const entry = header.closest('.exp-entry');
+    const body = entry.querySelector('.exp-body');
     const wasOpen = entry.classList.contains('open');
-    document.querySelectorAll('.exp-entry.open').forEach(e => e.classList.remove('open'));
-    if (!wasOpen) entry.classList.add('open');
+
+    // Close all open entries
+    document.querySelectorAll('.exp-entry.open').forEach(e => {
+      e.classList.remove('open');
+      e.querySelector('.exp-body').style.maxHeight = '0';
+    });
+
+    if (!wasOpen) {
+      entry.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
   }
 
   /* ── Skill tabs ── */
