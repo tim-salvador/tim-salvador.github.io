@@ -1553,7 +1553,7 @@
   /* ── PDF Resume Generator ── */
   async function generateResume(btn) {
     const origHTML = btn.innerHTML;
-    btn.innerHTML = 'Generating…';
+    btn.innerHTML = 'Generating...';
     btn.disabled = true;
 
     try {
@@ -1568,192 +1568,202 @@
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'pt', format: 'letter' });
-      const W = doc.internal.pageSize.getWidth();
-      const H = doc.internal.pageSize.getHeight();
-      const ML = 54, MR = 54, MT = 48;
-      const CW = W - ML - MR;
+      const PW = doc.internal.pageSize.getWidth();   // 612
+      const PH = doc.internal.pageSize.getHeight();  // 792
+      const ML = 60, MR = 60, MT = 52, MB = 52;
+      const TW = PW - ML - MR;  // usable text width: 492
       let y = MT;
 
-      // ── helpers ──────────────────────────────────────────────
-      function newPageIfNeeded(needed) {
-        if (y + needed > H - MT) { doc.addPage(); y = MT; }
+      // Strip non-Latin characters that Helvetica can't measure (em-dashes, bullets, etc.)
+      const clean = str => (str || '').replace(/[–—]/g, '-').replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim();
+
+      function guard(needed) {
+        if (y + needed > PH - MB) { doc.addPage(); y = MT; }
       }
 
-      function setStyle(size, weight, r, g, b) {
+      function style(size, weight, r, g, b) {
         doc.setFontSize(size);
         doc.setFont('helvetica', weight);
         doc.setTextColor(r, g, b);
       }
 
-      function writeWrapped(text, indent, size, weight, r, g, b) {
-        setStyle(size, weight, r, g, b);
-        const lh = size * 1.35;
-        const lines = doc.splitTextToSize(text, CW - indent);
-        newPageIfNeeded(lines.length * lh);
-        doc.text(lines, ML + indent, y);
-        y += lines.length * lh;
+      // Write wrapped text; hangIndent shifts wrap lines right of the first line's start
+      function wrap(text, x, maxW, size, weight, r, g, b, lineGap) {
+        style(size, weight, r, g, b);
+        const lh = size * 1.4;
+        const lines = doc.splitTextToSize(clean(text), maxW);
+        guard(lines.length * lh);
+        lines.forEach((ln, i) => {
+          doc.text(ln, x, y);
+          y += lh;
+        });
+        y += (lineGap || 0);
       }
 
-      function sectionDivider(title) {
-        y += 12;
-        newPageIfNeeded(22);
-        setStyle(9.5, 'bold', 20, 20, 20);
+      // Bullet with hanging indent: marker at x, wrapped text starts at x+hang
+      function bullet(text, x, hang, size, r, g, b) {
+        style(size, 'normal', r, g, b);
+        const lh = size * 1.4;
+        const marker = '-';
+        const lines = doc.splitTextToSize(clean(text), TW - (x - ML) - hang);
+        guard(lines.length * lh);
+        doc.text(marker, x, y);
+        lines.forEach((ln, i) => {
+          doc.text(ln, x + hang, y);
+          y += lh;
+        });
+      }
+
+      function section(title) {
+        y += 14;
+        guard(20);
+        style(9, 'bold', 20, 20, 20);
         doc.text(title, ML, y);
-        y += 4;
-        doc.setDrawColor(160, 160, 160);
-        doc.setLineWidth(0.75);
-        doc.line(ML, y, W - MR, y);
-        y += 10;
+        y += 3;
+        doc.setDrawColor(150, 150, 150);
+        doc.setLineWidth(0.6);
+        doc.line(ML, y, PW - MR, y);
+        y += 9;
       }
 
       // ── NAME & CONTACT ───────────────────────────────────────
-      setStyle(22, 'bold', 15, 15, 15);
+      style(22, 'bold', 15, 15, 15);
       doc.text('TIM SALVADOR', ML, y);
-      y += 26;
+      y += 24;
 
-      setStyle(8.5, 'normal', 90, 90, 90);
-      doc.text(
-        'getintouch@timsalvador.com  •  Chicago, IL  •  linkedin.com/in/tim-salvador  •  github.com/tim-salvador',
-        ML, y
-      );
-      y += 5;
+      style(8, 'normal', 90, 90, 90);
+      const contact = 'getintouch@timsalvador.com  |  Chicago, IL  |  linkedin.com/in/tim-salvador  |  github.com/tim-salvador';
+      const contactLines = doc.splitTextToSize(contact, TW);
+      contactLines.forEach(ln => { doc.text(ln, ML, y); y += 10; });
+      y += 2;
       doc.setDrawColor(180, 180, 180);
       doc.setLineWidth(0.5);
-      doc.line(ML, y, W - MR, y);
-      y += 14;
+      doc.line(ML, y, PW - MR, y);
+      y += 12;
 
       // ── SUMMARY ──────────────────────────────────────────────
-      sectionDivider('PROFESSIONAL SUMMARY');
-      const bio = document.querySelector('.hero-bio')?.textContent.trim() || '';
-      writeWrapped(bio, 0, 9.5, 'normal', 50, 50, 50);
-      y += 2;
+      section('PROFESSIONAL SUMMARY');
+      wrap(document.querySelector('.hero-bio')?.textContent, ML, TW, 9.5, 'normal', 50, 50, 50, 2);
 
       // ── CORE COMPETENCIES ────────────────────────────────────
-      sectionDivider('CORE COMPETENCIES');
+      section('CORE COMPETENCIES');
       const areas = [...document.querySelectorAll('.comp-area')]
-        .map(el => el.textContent.replace(/^\W+/, '').trim());
-      writeWrapped(areas.join('  •  '), 0, 9.5, 'normal', 50, 50, 50);
-      y += 2;
+        .map(el => clean(el.textContent.replace(/^\W+/, '')));
+      wrap(areas.join('  |  '), ML, TW, 9.5, 'normal', 50, 50, 50, 2);
 
       // ── EXPERIENCE ───────────────────────────────────────────
-      sectionDivider('PROFESSIONAL EXPERIENCE');
+      section('PROFESSIONAL EXPERIENCE');
 
       document.querySelectorAll('.exp-entry').forEach(entry => {
-        const pos   = entry.querySelector('.exp-pos')?.textContent.trim() || '';
-        const co    = entry.querySelector('.exp-company')?.textContent.trim() || '';
-        const dates = entry.querySelector('.exp-dates')?.textContent.trim() || '';
-        const loc   = entry.querySelector('.exp-loc')?.textContent.trim() || '';
-        const desc  = entry.querySelector('.exp-desc')?.textContent.trim() || '';
+        const pos   = clean(entry.querySelector('.exp-pos')?.textContent);
+        const co    = clean(entry.querySelector('.exp-company')?.textContent);
+        const dates = clean(entry.querySelector('.exp-dates')?.textContent);
+        const loc   = clean(entry.querySelector('.exp-loc')?.textContent);
+        const desc  = clean(entry.querySelector('.exp-desc')?.textContent);
         const lis   = [...entry.querySelectorAll('.exp-list li')];
-        const allPillDivs = [...entry.querySelectorAll('.tool-pills')];
+        const pillDivs = [...entry.querySelectorAll('.tool-pills')];
 
-        newPageIfNeeded(64);
+        guard(60);
 
-        // Role title + date range
-        setStyle(10.5, 'bold', 20, 20, 20);
+        // Job title (left) + dates (right) on same line
+        style(10.5, 'bold', 20, 20, 20);
         doc.text(pos, ML, y);
-        setStyle(9, 'normal', 110, 110, 110);
-        const dw = doc.getTextWidth(dates);
-        doc.text(dates, W - MR - dw, y);
-        y += 14;
-
-        // Company + location
-        setStyle(9.5, 'normal', 80, 80, 80);
-        doc.text(`${co}  |  ${loc}`, ML, y);
+        style(9, 'normal', 110, 110, 110);
+        doc.text(dates, PW - MR - doc.getTextWidth(dates), y);
         y += 13;
 
+        // Company | Location
+        style(9.5, 'normal', 75, 75, 75);
+        doc.text(`${co}  |  ${loc}`, ML, y);
+        y += 12;
+
         // Description
-        writeWrapped(desc, 0, 9.5, 'normal', 50, 50, 50);
-        y += 4;
+        wrap(desc, ML, TW, 9.5, 'normal', 45, 45, 45, 4);
 
-        // Achievements
+        // Key Achievements
         if (lis.length) {
-          setStyle(9.5, 'bold', 30, 30, 30);
+          style(9, 'bold', 30, 30, 30);
           doc.text('Key Achievements', ML, y);
-          y += 12;
+          y += 11;
           lis.forEach(li => {
-            writeWrapped('•  ' + li.textContent.trim(), 6, 9.5, 'normal', 50, 50, 50);
+            bullet(li.textContent, ML + 2, 10, 9, 45, 45, 45);
           });
-          y += 2;
+          y += 3;
         }
 
-        // Toolchain (first .tool-pills block)
-        if (allPillDivs[0]) {
-          const tools = [...allPillDivs[0].querySelectorAll('.tool-pill')]
-            .map(p => p.textContent.trim()).join(', ');
-          if (tools) writeWrapped('Tools: ' + tools, 0, 8.5, 'normal', 100, 100, 100);
+        // Toolchain
+        if (pillDivs[0]) {
+          const tools = [...pillDivs[0].querySelectorAll('.tool-pill')].map(p => clean(p.textContent)).join(', ');
+          if (tools) wrap('Tools: ' + tools, ML, TW, 8.5, 'normal', 95, 95, 95, 0);
         }
 
-        // Standards (last .tool-pills block, when there are 2+)
-        if (allPillDivs.length >= 2) {
-          const stds = [...allPillDivs[allPillDivs.length - 1].querySelectorAll('.tool-pill')]
-            .map(p => p.textContent.trim()).join(', ');
-          if (stds) writeWrapped('Standards: ' + stds, 0, 8.5, 'normal', 100, 100, 100);
+        // Standards
+        if (pillDivs.length >= 2) {
+          const stds = [...pillDivs[pillDivs.length-1].querySelectorAll('.tool-pill')].map(p => clean(p.textContent)).join(', ');
+          if (stds) wrap('Standards: ' + stds, ML, TW, 8.5, 'normal', 95, 95, 95, 0);
         }
 
         y += 12;
       });
 
-      // ── SKILLS ───────────────────────────────────────────────
-      sectionDivider('TECHNICAL SKILLS');
+      // ── TECHNICAL SKILLS ─────────────────────────────────────
+      section('TECHNICAL SKILLS');
 
       const tabs   = [...document.querySelectorAll('.skill-tab')];
       const panels = [...document.querySelectorAll('.skill-panel')];
       panels.forEach((panel, i) => {
-        const label = tabs[i]?.textContent.trim() || '';
-        const chips = [...panel.querySelectorAll('.skill-chip')]
-          .map(c => c.textContent.trim()).join(', ');
+        const label = clean(tabs[i]?.textContent);
+        const chips = [...panel.querySelectorAll('.skill-chip')].map(c => clean(c.textContent)).join(', ');
         if (!chips) return;
-        setStyle(9.5, 'bold', 40, 40, 40);
-        newPageIfNeeded(22);
+        guard(22);
+        style(9, 'bold', 40, 40, 40);
         doc.text(label + ':', ML, y);
-        y += 12;
-        writeWrapped(chips, 8, 9.5, 'normal', 60, 60, 60);
-        y += 5;
+        y += 11;
+        wrap(chips, ML + 6, TW - 6, 9.5, 'normal', 55, 55, 55, 5);
       });
 
       // ── EDUCATION ────────────────────────────────────────────
-      sectionDivider('EDUCATION');
+      section('EDUCATION');
 
       document.querySelectorAll('.edu-card').forEach(card => {
-        const degree = card.querySelector('.edu-degree')?.textContent.trim() || '';
-        const field  = card.querySelector('.edu-field')?.textContent.trim() || '';
-        const school = card.querySelector('.edu-school')?.textContent.trim() || '';
-        const yr     = card.querySelector('.edu-year')?.textContent.trim() || '';
-        const descEl = card.querySelector('.edu-desc')?.textContent.trim() || '';
+        const degree = clean(card.querySelector('.edu-degree')?.textContent);
+        const field  = clean(card.querySelector('.edu-field')?.textContent);
+        const school = clean(card.querySelector('.edu-school')?.textContent);
+        const yr     = clean(card.querySelector('.edu-year')?.textContent);
+        const desc   = clean(card.querySelector('.edu-desc')?.textContent);
 
-        newPageIfNeeded(50);
-        setStyle(10, 'bold', 20, 20, 20);
+        guard(46);
+        style(10, 'bold', 20, 20, 20);
         doc.text(`${degree} in ${field}`, ML, y);
-        setStyle(9, 'normal', 110, 110, 110);
-        doc.text(yr, W - MR - doc.getTextWidth(yr), y);
-        y += 13;
-        setStyle(9.5, 'normal', 70, 70, 70);
-        doc.text(school, ML, y);
+        style(9, 'normal', 110, 110, 110);
+        doc.text(yr, PW - MR - doc.getTextWidth(yr), y);
         y += 12;
-        writeWrapped(descEl, 0, 9, 'normal', 90, 90, 90);
-        y += 8;
+        style(9.5, 'normal', 65, 65, 65);
+        doc.text(school, ML, y);
+        y += 11;
+        wrap(desc, ML, TW, 9, 'normal', 90, 90, 90, 8);
       });
 
       // ── CERTIFICATIONS ───────────────────────────────────────
-      sectionDivider('CERTIFICATIONS');
+      section('CERTIFICATIONS');
 
       document.querySelectorAll('.cert-card').forEach(card => {
-        const name   = card.querySelector('.cert-name')?.textContent.trim() || '';
-        const issuer = card.querySelector('.cert-issuer')?.textContent.trim() || '';
-        const cdesc  = card.querySelector('.cert-desc')?.textContent.trim() || '';
-        newPageIfNeeded(36);
-        setStyle(9.5, 'bold', 20, 20, 20);
-        doc.text('•  ' + name, ML + 4, y);
+        const name   = clean(card.querySelector('.cert-name')?.textContent);
+        const issuer = clean(card.querySelector('.cert-issuer')?.textContent);
+        const cdesc  = clean(card.querySelector('.cert-desc')?.textContent);
+
+        guard(40);
+        style(10, 'bold', 20, 20, 20);
+        doc.text(name, ML, y);
         y += 12;
-        setStyle(9, 'normal', 90, 90, 90);
-        doc.text(issuer, ML + 12, y);
+        style(9, 'normal', 80, 80, 80);
+        doc.text(issuer, ML, y);
         y += 11;
-        writeWrapped(cdesc, 12, 9, 'normal', 110, 110, 110);
-        y += 4;
+        wrap(cdesc, ML, TW, 9, 'normal', 100, 100, 100, 8);
       });
 
       doc.save('Tim_Salvador_Resume.pdf');
+
     } catch (err) {
       console.error('PDF generation failed:', err);
       alert('Could not generate PDF. Please try again.');
