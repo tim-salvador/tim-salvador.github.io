@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | Tim Salvador</title>
+  <meta name="description" content="Page not found.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #070d1a;
+      --bg2:   #0c1629;
+      --bg3:   #111e38;
+      --border:#1a3050;
+      --cyan:  #22d3ee;
+      --green: #10b981;
+      --text:  #dde6f0;
+      --muted: #607898;
+      --dim:   #8fa9c5;
+      --mono:  'Space Mono', monospace;
+      --sans:  'DM Sans', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .terminal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 640px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(34,211,238,.08);
+      animation: terminal-glitch 5s infinite;
+      position: relative;
+    }
+    @keyframes terminal-glitch {
+      0%,  87%, 100% {
+        transform: translate(0) skewX(0deg);
+        filter: none;
+        box-shadow: 0 0 40px rgba(34,211,238,.08);
+      }
+      88% {
+        transform: translate(-4px, 0) skewX(-0.4deg);
+        filter: drop-shadow(5px 0 rgba(34,211,238,.7));
+        box-shadow: -5px 0 0 rgba(34,211,238,.35), 5px 0 0 rgba(251,146,60,.35), 0 0 40px rgba(34,211,238,.2);
+      }
+      89% {
+        transform: translate(4px, 0) skewX(0.4deg);
+        filter: drop-shadow(-5px 0 rgba(251,146,60,.7));
+        box-shadow: 5px 0 0 rgba(34,211,238,.35), -5px 0 0 rgba(251,146,60,.35), 0 0 40px rgba(34,211,238,.2);
+      }
+      90% {
+        transform: translate(-2px, 0) skewX(0deg);
+        filter: drop-shadow(3px 0 rgba(34,211,238,.4)) drop-shadow(-3px 0 rgba(251,146,60,.4));
+        box-shadow: 0 0 40px rgba(34,211,238,.15);
+      }
+      91% {
+        transform: translate(0) skewX(0deg);
+        filter: none;
+        box-shadow: 0 0 40px rgba(34,211,238,.08);
+      }
+    }
+    .terminal-bar {
+      background: var(--bg3);
+      padding: .6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width:12px; height:12px; border-radius:50%; }
+    .dot-r { background:#ff5f57; }
+    .dot-y { background:#febc2e; }
+    .dot-g { background:#28c840; }
+    .terminal-title { font-family: var(--mono); font-size:.75rem; color: var(--muted); margin-left: auto; margin-right: auto; padding-right: 36px; }
+    .terminal-body {
+      padding: 1.75rem 2rem 2rem;
+      font-family: var(--mono);
+      font-size: .9rem;
+      line-height: 1.9;
+      position: relative;
+      animation: text-glitch 5s infinite;
+    }
+    @keyframes text-glitch {
+      0%,  87%, 100% { filter: none; }
+      88%             { filter: brightness(1.2) contrast(1.1) hue-rotate(10deg); }
+      88.5%           { filter: brightness(0.85) hue-rotate(-15deg); }
+      89%             { filter: brightness(1.1) contrast(1.05); }
+      90%             { filter: brightness(0.95); }
+      91%             { filter: none; }
+    }
+    .terminal-body::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(34,211,238,.5), transparent);
+      pointer-events: none;
+      z-index: 5;
+      animation: scan-sweep 5s infinite;
+    }
+    @keyframes scan-sweep {
+      0%,  87%, 100% { opacity: 0; top: 0; }
+      88%             { opacity: 1; top: 10%; }
+      89%             { opacity: 1; top: 50%; }
+      90%             { opacity: 1; top: 85%; }
+      91%             { opacity: 0; top: 100%; }
+    }
+    .terminal-body::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,.06) 3px,
+        rgba(0,0,0,.06) 4px
+      );
+      pointer-events: none;
+    }
+    .prompt { color: var(--muted); }
+    .cmd    { color: var(--cyan); }
+    .out    { color: var(--dim); }
+    .err    { color: #f87171; }
+    .ok     { color: var(--green); }
+    .line   { display: block; }
+    .line:nth-child(1), .line:nth-child(3), .line:nth-child(6) {
+      animation: line-r 5s infinite;
+    }
+    .line:nth-child(2), .line:nth-child(4), .line:nth-child(7), .line:nth-child(9) {
+      animation: line-l 5s infinite;
+    }
+    .line:nth-child(11) {
+      animation: line-r 5s infinite .04s;
+    }
+    @keyframes line-r {
+      0%,  87.5%, 100% { transform: translateX(0); }
+      88%               { transform: translateX(5px); }
+      89%               { transform: translateX(-3px); }
+      90%               { transform: translateX(1px); }
+      91%               { transform: translateX(0); }
+    }
+    @keyframes line-l {
+      0%,  87.5%, 100% { transform: translateX(0); }
+      88%               { transform: translateX(-5px); }
+      89%               { transform: translateX(3px); }
+      90%               { transform: translateX(-1px); }
+      91%               { transform: translateX(0); }
+    }
+    .cursor {
+      display: inline-block;
+      width: 9px; height: 1.1em;
+      background: var(--cyan);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .home-link {
+      color: var(--cyan);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(34,211,238,.3);
+      transition: border-color .2s;
+    }
+    .home-link:hover { border-color: var(--cyan); }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="dot dot-r"></span>
+      <span class="dot dot-y"></span>
+      <span class="dot dot-g"></span>
+      <span class="terminal-title">bash — tim-salvador.github.io</span>
+    </div>
+    <div class="terminal-body">
+      <span class="line"><span class="prompt">~  $</span> <span class="cmd">curl https://tim-salvador.github.io/unknown-path</span></span>
+      <span class="line out">&gt; resolving host...</span>
+      <span class="line out">&gt; connected.</span>
+      <span class="line out">&gt; sending request...</span>
+      <span class="line">&nbsp;</span>
+      <span class="line err">&gt; HTTP 404 — route not found.</span>
+      <span class="line err">&gt; The page you requested does not exist.</span>
+      <span class="line">&nbsp;</span>
+      <span class="line out">&gt; Tip: navigate home to get back on track.</span>
+      <span class="line">&nbsp;</span>
+      <span class="line"><span class="prompt">~  $</span> <span class="cmd"><a href="/" class="home-link">cd /home</a></span></span>
+      <span class="line ok">&gt; returning home... <span class="cursor"></span></span>
+    </div>
+  </div>
+</body>
+</html>
