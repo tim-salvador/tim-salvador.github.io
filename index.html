@@ -1552,6 +1552,8 @@
 
   /* ── PDF Resume Generator ── */
   async function generateResume(btn) {
+    if (typeof zaraz !== 'undefined') zaraz.track('Resume Downloaded');
+
     const origHTML = btn.innerHTML;
     btn.innerHTML = 'Generating...';
     btn.disabled = true;
@@ -1773,5 +1775,6 @@
     }
   }
 </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4df5249156b746839db6e913ec843511"}'></script>
 </body>
 </html>
