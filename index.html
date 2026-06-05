@@ -10,8 +10,12 @@
   <meta property="og:description" content="Cybersecurity leader specializing in DFIR, Threat Intelligence, SOC engineering, and cloud security. OSCP, GCFA.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.timsalvador.com/">
+  <meta property="og:image" content="https://www.timsalvador.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@timsalvador">
+  <meta name="twitter:image" content="https://www.timsalvador.com/assets/img/og-image.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -918,9 +922,22 @@
     }
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--cyan); }
+
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px rgba(34,211,238,.7);
+      z-index: 9999;
+      transition: width .08s linear;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
+<div id="progress-bar"></div>
 
 <!-- ═══ NAV ══════════════════════════════════════════════════════════════════ -->
 <nav id="nav">
@@ -1469,6 +1486,12 @@
 
 <script>
   /* ── Hamburger ── */
+  /* Scroll progress bar */
+  const _pb = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    _pb.style.width = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100) + '%';
+  }, { passive: true });
+
   const ham = document.getElementById('hamburger');
   const navLinks = document.getElementById('nav-links');
   ham.addEventListener('click', () => {

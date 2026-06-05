@@ -32,6 +32,7 @@ exclude:
 # Include in processing
 include:
   - _pages
+  - .well-known
 
 # Collections
 collections:

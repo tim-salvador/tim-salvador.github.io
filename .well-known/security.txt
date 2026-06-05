@@ -1,0 +1,5 @@
+# Security contact for timsalvador.com
+Contact:             mailto:getintouch@timsalvador.com
+Expires:             2027-01-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical:           https://www.timsalvador.com/.well-known/security.txt
