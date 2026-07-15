@@ -189,7 +189,7 @@
       <span class="terminal-title">bash — www.timsalvador.com</span>
     </div>
     <div class="terminal-body">
-      <span class="line"><span class="prompt">~  $</span> <span class="cmd">curl https://www.timsalvador.com/unknown-path</span></span>
+      <span class="line"><span class="prompt">~  $</span> <span class="cmd">curl <span id="req-url">https://www.timsalvador.com/unknown-path</span></span></span>
       <span class="line out">&gt; resolving host...</span>
       <span class="line out">&gt; connected.</span>
       <span class="line out">&gt; sending request...</span>
@@ -203,6 +203,7 @@
       <span class="line ok">&gt; returning home... <span class="cursor"></span></span>
     </div>
   </div>
+<script>document.getElementById('req-url').textContent = window.location.href;</script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4df5249156b746839db6e913ec843511"}'></script>
 </body>
 </html>
