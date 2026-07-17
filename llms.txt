@@ -1,0 +1,55 @@
+# Tim Salvador
+
+> Security leader with deep roots in detection engineering, incident response, and adversary emulation across multiple industries. Specializing in Security Operations, Threat Intelligence, and cloud security.
+
+Tim Salvador is a cybersecurity leader based in Chicago, IL with 15+ years of experience across 6 enterprise organizations spanning finance, pharma, tech, logistics, and media. He holds an OSCP (Offensive Security, 2023) and GCFA (GIAC, 2020). He has built 100+ custom detections across SIEM platforms and has held roles ranging from hands-on security analyst to senior security management.
+
+## What Tim Does
+
+- Security Operations and SOC leadership
+- Incident Response and digital forensics
+- Threat Intelligence and adversary profiling
+- Adversary Emulation, Red/Blue/Green team operations, and penetration testing
+- Cloud security across AWS, GCP, and Azure
+- Detection engineering and SIEM automation (Splunk, Elastic, Chronicle, InsightIDR)
+- Security program strategy, team building, and executive communication
+
+## Key Achievements
+
+- 80%+ noise reduction through custom SIEM detection rules and automation
+- Sub-4-hour containment on ransomware, credential theft, and DDoS incidents with zero data exfiltration
+- Reduced MTTR by 25-40% across multiple enterprise environments
+- 100% ISO 27001 and NIST compliance at Groupon
+- Migrated on-premises security stack to cloud-native platforms, reducing costs by 80%
+- Mentored analysts to senior roles and management across multiple organizations
+
+## Career History
+
+- Incident Responder Manager, Illinois Tool Works Inc. (04/2024 - 10/2024)
+- Senior Information Security Manager II, Groupon Inc. (03/2020 - 07/2023)
+- Sr Security Analyst III, CSIRT, AbbVie Inc. (08/2018 - 02/2020)
+- Threat Exposure Manager, Uptake Inc. (06/2015 - 06/2018)
+- Security Analyst, Cleverbridge Inc. (06/2010 - 06/2015)
+- Network Engineer, OnShore Networks Inc. (2008 - 2010)
+
+## Education
+
+- Master of Science, Computer, Information and Network Security, DePaul University (2012)
+- Bachelor of Science, Telecommunications and Network Management, DeVry University (2006)
+
+## Certifications
+
+- Offensive Security Certified Professional (OSCP), Offensive Security, 2023
+- GIAC Certified Forensic Analyst (GCFA), GIAC, 2020
+
+## Pages
+
+- [Home](https://www.timsalvador.com/): Full profile including bio, experience, skills, education, certifications, and contact
+
+## Contact
+
+- Email: getintouch@timsalvador.com
+- LinkedIn: https://www.linkedin.com/in/tim-salvador/
+- GitHub: https://github.com/tim-salvador/
+- X / Twitter: https://x.com/timsalvador
+- Keybase: https://keybase.io/tsalvador
