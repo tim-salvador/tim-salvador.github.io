@@ -363,6 +363,25 @@
       transition: border-color .2s, color .2s, background .2s;
     }
     .ask-ai-btn:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(34,211,238,.06); }
+    .ai-toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(2rem);
+      background: var(--bg3);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: .75rem;
+      padding: .6rem 1.25rem;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+    .ai-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .hero-stats {
       display: flex;
@@ -1554,6 +1573,8 @@
   <a href="#hero">www.timsalvador.com</a> &nbsp;·&nbsp; Chicago, IL &nbsp;·&nbsp; getintouch@timsalvador.com
 </footer>
 
+<div id="ai-toast" class="ai-toast">Prompt copied. Paste it into Gemini to get started.</div>
+
 <script>
   /* ── Ask AI ── */
   const _aiPrompt = encodeURIComponent(
@@ -1568,10 +1589,23 @@
     perplexity: 'https://www.perplexity.ai/search?q=' + _aiPrompt,
     chatgpt:    'https://chatgpt.com/?q=' + _aiPrompt,
     claude:     'https://claude.ai/new?q=' + _aiPrompt,
-    gemini:     'https://gemini.google.com/app?q=' + _aiPrompt,
+    gemini:     'https://gemini.google.com/app',
   };
+  const _aiRawPrompt =
+    'Tell me about Tim Salvador based on https://www.timsalvador.com, ' +
+    'https://www.linkedin.com/in/tim-salvador/, and https://github.com/tim-salvador/. ' +
+    'Draw directly from each source including his bio, headline, summary, projects, and contact details. ' +
+    'Provide a cited, bullet-pointed profile covering: who he is, the value he brings, what he does, and his key achievements. ' +
+    'Format his contact information precisely as it appears across his site, LinkedIn, and GitHub, ' +
+    'including direct email, contact form, and social links. Summarize how to get in touch.';
   function openAI(provider, e) {
     e.preventDefault();
+    if (provider === 'gemini') {
+      navigator.clipboard.writeText(_aiRawPrompt).catch(() => {});
+      const toast = document.getElementById('ai-toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
     window.open(_aiUrls[provider], '_blank', 'noopener');
   }
 
