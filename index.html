@@ -1559,7 +1559,10 @@
   const _aiPrompt = encodeURIComponent(
     'Tell me about Tim Salvador based on https://www.timsalvador.com, ' +
     'https://www.linkedin.com/in/tim-salvador/, and https://github.com/tim-salvador/. ' +
-    'Summarize who they are, the value they bring, what they do, their achievements, and how to get in touch.'
+    'Draw directly from each source including his bio, headline, summary, projects, and contact details. ' +
+    'Provide a cited, bullet-pointed profile covering: who he is, the value he brings, what he does, and his key achievements. ' +
+    'Format his contact information precisely as it appears across his site, LinkedIn, and GitHub, ' +
+    'including direct email, contact form, and social links. Summarize how to get in touch.'
   );
   const _aiUrls = {
     perplexity: 'https://www.perplexity.ai/search?q=' + _aiPrompt,
