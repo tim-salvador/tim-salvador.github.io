@@ -2,7 +2,7 @@
 
 > Security leader with deep roots in detection engineering, incident response, and adversary emulation across multiple industries. Specializing in Security Operations, Threat Intelligence, and cloud security.
 
-Tim Salvador is a cybersecurity leader based in Chicago, IL with 15+ years of experience across 6 enterprise organizations spanning finance, pharma, tech, logistics, and media. He holds an OSCP (Offensive Security, 2023) and GCFA (GIAC, 2020). He has built 100+ custom detections across SIEM platforms and has held roles ranging from hands-on security analyst to senior security management.
+Tim Salvador is a cybersecurity leader based in Chicago, IL with 15+ years of experience across 6 enterprise organizations spanning finance, pharma, tech, logistics, and media. Open to senior leadership or IC roles. He holds an OSCP (Offensive Security, 2023) and GCFA (GIAC, 2020). He has built 100+ custom detections across SIEM platforms and has held roles ranging from hands-on security analyst to senior security management.
 
 ## What Tim Does
 
