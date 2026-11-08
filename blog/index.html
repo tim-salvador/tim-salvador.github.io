@@ -204,7 +204,11 @@
       letter-spacing: .25em;
       text-transform: uppercase;
       margin-bottom: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
     }
+    .section-tag::before { content: '//'; color: var(--muted); }
     .page-title {
       font-family: var(--mono);
       font-size: clamp(1.5rem, 3.5vw, 2.25rem);
@@ -472,8 +476,8 @@
 </nav>
 
 <main class="page">
-  <div class="section-tag">// writeups</div>
-  <h1 class="page-title">Blog</h1>
+  <div class="section-tag">Blog</div>
+  <h1 class="page-title">Writeups &amp; Research</h1>
   <article class="featured">
     <a class="featured-media" href="/blog/rx580-proxmox-gpu-lxc/" tabindex="-1" aria-hidden="true"><img src="/blog/rx580-proxmox-gpu-lxc/images/cover.jpg" alt=""></a>
     <div class="featured-body">

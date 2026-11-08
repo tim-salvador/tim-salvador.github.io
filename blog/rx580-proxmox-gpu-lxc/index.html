@@ -33,7 +33,7 @@
   "headline": "Two $60 GPUs, One Hypervisor: Running Local LLMs and hashcat on Proxmox with AMD Polaris",
   "description": "How I got a pair of Radeon RX 580s doing useful work inside Proxmox LXCs: Ollama over Vulkan, hashcat over Rusticl, Home Assistant on top, and every dead end in between.",
   "datePublished": "2026-11-03",
-  "dateModified": "2026-11-03",
+  "dateModified": "2026-11-08",
   "author": {
     "@id": "https://www.timsalvador.com/#person"
   },
@@ -203,7 +203,11 @@
       letter-spacing: .25em;
       text-transform: uppercase;
       margin-bottom: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
     }
+    .section-tag::before { content: '//'; color: var(--muted); }
     .page-title {
       font-family: var(--mono);
       font-size: clamp(1.5rem, 3.5vw, 2.25rem);
@@ -478,7 +482,7 @@
         <nav class="crumb" aria-label="Breadcrumb"><a href="/blog/">blog</a> / rx580-proxmox-gpu-lxc</nav>
         <h1 class="post-title">Two $60 GPUs, One Hypervisor: Running Local LLMs and hashcat on Proxmox with AMD Polaris</h1>
         <p class="post-subtitle">How I got a pair of Radeon RX 580s doing useful work inside Proxmox LXCs: Ollama over Vulkan, hashcat over Rusticl, Home Assistant on top, and every dead end in between.</p>
-        <div class="meta">2026-11-03 &middot; 16 min read &middot; Tim Salvador</div>
+        <div class="meta">2026-11-03 &middot; 16 min read &middot; Tim Salvador &middot; Updated 2026-11-08</div>
       </header>
       <details class="toc-mobile"><summary>On this page</summary><ul class="toc-list"><li><a href="#tldr">TL;DR</a></li><li><a href="#the-setup">The setup</a></li><li><a href="#act-1-the-rocm-dead-end-the-first-attempt-months-ago">Act 1: The ROCm dead end (the first attempt, months ago)</a></li><li><a href="#act-2-coming-back-to-it-and-a-false-start-on-the-wrong-vendor">Act 2: Coming back to it, and a false start on the wrong vendor</a></li><li><a href="#act-3-the-path-that-works-mesa-not-rocm">Act 3: The path that works (Mesa, not ROCm)</a></li><li class="toc-sub"><a href="#the-architecture">The architecture</a></li><li><a href="#act-4-cleaning-up-the-past-the-rocm-landmine-detonates">Act 4: Cleaning up the past (the ROCm landmine detonates)</a></li><li><a href="#act-5-it-works">Act 5: It works</a></li><li><a href="#the-benchmarks-and-honest-tradeoffs">The benchmarks, and honest tradeoffs</a></li><li class="toc-sub"><a href="#ollama-vulkan-radv">Ollama (Vulkan / RADV)</a></li><li class="toc-sub"><a href="#hashcat-opencl-rusticl">hashcat (OpenCL / Rusticl)</a></li><li class="toc-sub"><a href="#honest-tradeoff-1-model-load-time-is-brutal-and-its-the-disk">Honest tradeoff #1: model load time is brutal, and it&#39;s the disk</a></li><li class="toc-sub"><a href="#honest-tradeoff-2-polaris-limits-are-real">Honest tradeoff #2: Polaris limits are real</a></li><li><a href="#the-gotchas-that-cost-me-time-collected">The gotchas that cost me time (collected)</a></li><li><a href="#the-side-quests-because-homelabs-are-never-one-thing">The side quests (because homelabs are never one thing)</a></li><li><a href="#the-clean-kernel-upgrade-the-payoff">The clean kernel upgrade (the payoff)</a></li><li><a href="#the-scripts">The scripts</a></li><li><a href="#would-i-recommend-it">Would I recommend it?</a></li></ul></details>
       <img class="post-cover" src="images/cover.jpg" alt="Two $60 GPUs, One Hypervisor: Running Local LLMs and hashcat on Proxmox with AMD Polaris">
@@ -771,9 +775,6 @@ E: The repository ... is not signed.
 <p><strong>Good at:</strong> local LLM inference up to ~8B at usable speeds, 14B if you accept ~7 tok/s, and fast-hash cracking that&#39;s ~30-90x your CPU. 16GB of total VRAM across two cards for the price of a nice dinner.</p>
 <p><strong>Bad at:</strong> anything needing ROCm/CUDA (PyTorch training, most ML tooling), bcrypt/modern-KDF cracking at scale, and fast cold model loads if your host is on spinning rust.</p>
 <p>The real lesson, the one that generalizes past these specific cards: <strong>the vendor&#39;s blessed path isn&#39;t the only path, and sometimes it&#39;s a dead end for your exact hardware.</strong> ROCm said no to Polaris. Mesa said yes. The open-source driver stack quietly grew compute front-ends (RADV for Vulkan, Rusticl for OpenCL) that resurrect &quot;unsupported&quot; silicon for real work. That&#39;s worth knowing before you write off an old card, or buy a new one you don&#39;t need.</p>
-<hr>
-<p><em>Build notes, scripts, and the full validation harness are in the companion repo: <a href="https://github.com/tim-salvador/rx580-proxmox-gpu-lxc">github.com/tim-salvador/rx580-proxmox-gpu-lxc</a>. Questions or corrections welcome.</em></p>
-<p><em>Tim Salvador · <a href="https://timsalvador.com">timsalvador.com</a> · <a href="https://github.com/tim-salvador">github.com/tim-salvador</a> · <a href="https://linkedin.com/in/tim-salvador">linkedin.com/in/tim-salvador</a></em></p>
       </article>
       <aside class="source">
         Source, scripts and notes live in the project repo.<br>
