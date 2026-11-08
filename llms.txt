@@ -46,6 +46,11 @@ Tim Salvador is a cybersecurity leader based in Chicago, IL with 15+ years of ex
 
 - [Home](https://www.timsalvador.com/): Full profile including bio, experience, skills, education, certifications, and contact
 
+## Writeups
+
+- [Blog](https://www.timsalvador.com/blog/): Technical writeups by Tim Salvador
+- [Two $60 GPUs, One Hypervisor: Running Local LLMs and hashcat on Proxmox with AMD Polaris](https://www.timsalvador.com/blog/rx580-proxmox-gpu-lxc/): How I got a pair of Radeon RX 580s doing useful work inside Proxmox LXCs: Ollama over Vulkan, hashcat over Rusticl, Home Assistant on top, and every dead end in between. Full text in Markdown: https://www.timsalvador.com/blog/rx580-proxmox-gpu-lxc/index.md
+
 ## Contact
 
 - Email: getintouch@timsalvador.com
