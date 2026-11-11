@@ -217,7 +217,7 @@ inject(connect())
 
 This is the Metasploit `python/meterpreter/reverse_tcp` pattern, and every detail matches. Port 4444 is the framework default. The code reads a 4-byte little-endian length and then pulls exactly that many bytes, which is the Meterpreter staging protocol. The `\xBF` byte it writes over the start of the buffer is the opcode for `mov edi, imm32`, and the socket file descriptor is patched in right after it, so the second stage inherits the already-open connection instead of dialing out again. Then the classic injection: `VirtualAlloc` with `0x40` (`PAGE_EXECUTE_READWRITE`), copy the shellcode in, run it on a new thread.
 
-The `timsalvador.com` C2 and the resume theme match my own domain, so this is a red-team or training sample rather than something caught in the wild. It is still fully functional; the only missing piece is a listener on the other end.
+The `timsalvador.com` C2 and the resume theme match my own domain, so this is a training sample rather than something caught in the wild. It is still fully functional; the only missing piece is a listener on the other end.
 
 **Lesson #6:** You can identify a staged payload by its wire protocol and its syscall sequence even when you never see the stage it downloads. A 4-byte length prefix, a socket-reuse splice, and a `VirtualAlloc(RWX)` then `CreateThread` tail are a fingerprint. Name the family from the stager; you do not need the stage.
 

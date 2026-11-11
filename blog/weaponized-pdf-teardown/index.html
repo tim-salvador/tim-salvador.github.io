@@ -663,7 +663,7 @@ def inject(sc):
 inject(connect())
 </code></pre></div>
 <p>This is the Metasploit <code>python/meterpreter/reverse_tcp</code> pattern, and every detail matches. Port 4444 is the framework default. The code reads a 4-byte little-endian length and then pulls exactly that many bytes, which is the Meterpreter staging protocol. The <code>\xBF</code> byte it writes over the start of the buffer is the opcode for <code>mov edi, imm32</code>, and the socket file descriptor is patched in right after it, so the second stage inherits the already-open connection instead of dialing out again. Then the classic injection: <code>VirtualAlloc</code> with <code>0x40</code> (<code>PAGE_EXECUTE_READWRITE</code>), copy the shellcode in, run it on a new thread.</p>
-<p>The <code>timsalvador.com</code> C2 and the resume theme match my own domain, so this is a red-team or training sample rather than something caught in the wild. It is still fully functional; the only missing piece is a listener on the other end.</p>
+<p>The <code>timsalvador.com</code> C2 and the resume theme match my own domain, so this is a training sample rather than something caught in the wild. It is still fully functional; the only missing piece is a listener on the other end.</p>
 <p><strong>Lesson #6:</strong> You can identify a staged payload by its wire protocol and its syscall sequence even when you never see the stage it downloads. A 4-byte length prefix, a socket-reuse splice, and a <code>VirtualAlloc(RWX)</code> then <code>CreateThread</code> tail are a fingerprint. Name the family from the stager; you do not need the stage.</p>
 <hr>
 <h2 id="the-architecture">The architecture</h2>
