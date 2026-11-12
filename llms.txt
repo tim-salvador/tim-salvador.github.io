@@ -49,6 +49,7 @@ Tim Salvador is a cybersecurity leader based in Chicago, IL with 15+ years of ex
 ## Writeups
 
 - [Blog](https://www.timsalvador.com/blog/): Technical writeups by Tim Salvador
+- [Three Flags, One Decoy, and an ESP32: Reverse Engineering a Thotcon 0xC Badge](https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/): I dumped a conference badge's flash, decompiled its Xtensa firmware, stood up a fake conference Wi-Fi network to talk to it, and found that its headline `flag` command was built to lie to me. Full text in Markdown: https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/index.md
 - [Anatomy of a malicious PDF: from `/OpenAction` to a Meterpreter reverse shell](https://www.timsalvador.com/blog/weaponized-pdf-teardown/): Statically unpacking a resume-themed PDF that auto-runs on open, drops a disguised PyInstaller binary, and stages a Meterpreter reverse shell. Full text in Markdown: https://www.timsalvador.com/blog/weaponized-pdf-teardown/index.md
 - [Two $60 GPUs, One Hypervisor: Running Local LLMs and hashcat on Proxmox with AMD Polaris](https://www.timsalvador.com/blog/rx580-proxmox-gpu-lxc/): How I got a pair of Radeon RX 580s doing useful work inside Proxmox LXCs: Ollama over Vulkan, hashcat over Rusticl, Home Assistant on top, and every dead end in between. Full text in Markdown: https://www.timsalvador.com/blog/rx580-proxmox-gpu-lxc/index.md
 

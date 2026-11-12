@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- generated, do not edit; source: https://github.com/tim-salvador/reversing-the-thotcon-0xc-badge -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three Flags, One Decoy, and an ESP32: Reverse Engineering a Thotcon 0xC Badge | Tim Salvador</title>
+  <meta name="description" content="I dumped a conference badge&#39;s flash, decompiled its Xtensa firmware, stood up a fake conference Wi-Fi network to talk to it, and found that its headline `flag` command was built to lie to me.">
+  <meta name="author" content="Tim Salvador">
+  <meta name="theme-color" content="#070d1a">
+  <link rel="canonical" href="https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/">
+  <meta property="og:title" content="Three Flags, One Decoy, and an ESP32: Reverse Engineering a Thotcon 0xC Badge">
+  <meta property="og:description" content="I dumped a conference badge&#39;s flash, decompiled its Xtensa firmware, stood up a fake conference Wi-Fi network to talk to it, and found that its headline `flag` command was built to lie to me.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/">
+  <meta property="og:image" content="https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/images/cover.jpg">
+  <meta property="og:image:alt" content="A Thotcon 0xC badge connected to a laptop over a USB-serial cable, with a terminal showing the badge boot banner and the line &quot;uart flag: flag{welcome_to_the_8bit_world}&quot;.">
+  <meta name="twitter:image:alt" content="A Thotcon 0xC badge connected to a laptop over a USB-serial cable, with a terminal showing the badge boot banner and the line &quot;uart flag: flag{welcome_to_the_8bit_world}&quot;.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Three Flags, One Decoy, and an ESP32: Reverse Engineering a Thotcon 0xC Badge">
+  <meta name="twitter:description" content="I dumped a conference badge&#39;s flash, decompiled its Xtensa firmware, stood up a fake conference Wi-Fi network to talk to it, and found that its headline `flag` command was built to lie to me.">
+  <meta name="twitter:creator" content="@timsalvador">
+  <meta name="twitter:image" content="https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/images/cover.jpg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="alternate" type="text/markdown" href="https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/index.md">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "@id": "https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/#article",
+  "headline": "Three Flags, One Decoy, and an ESP32: Reverse Engineering a Thotcon 0xC Badge",
+  "description": "I dumped a conference badge's flash, decompiled its Xtensa firmware, stood up a fake conference Wi-Fi network to talk to it, and found that its headline `flag` command was built to lie to me.",
+  "datePublished": "2026-11-12",
+  "dateModified": "2026-11-12",
+  "author": {
+    "@id": "https://www.timsalvador.com/#person"
+  },
+  "publisher": {
+    "@id": "https://www.timsalvador.com/#person"
+  },
+  "image": "https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/images/cover.jpg",
+  "url": "https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/",
+  "mainEntityOfPage": "https://www.timsalvador.com/blog/reversing-the-thotcon-0xc-badge/",
+  "keywords": "reverse-engineering, esp32, firmware, hardware",
+  "isBasedOn": "https://github.com/tim-salvador/reversing-the-thotcon-0xc-badge"
+}
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #070d1a;
+      --bg2:      #0c1629;
+      --bg3:      #111e38;
+      --border:   #1a3050;
+      --cyan:     #22d3ee;
+      --cyan-dim: rgba(34,211,238,.12);
+      --amber:    #f59e0b;
+      --green:    #10b981;
+      --text:     #dde6f0;
+      --muted:    #607898;
+      --dim:      #8fa9c5;
+      --mono:     'Space Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+      --nav-h:    60px;
+      --max:      1100px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 1rem); }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    a { color: var(--cyan); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+    /* Nav (matches the homepage) */
+    nav#nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background: rgba(7,13,26,.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: .85rem;
+      color: var(--cyan);
+      text-decoration: none;
+      letter-spacing: .05em;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .nav-logo::before {
+      content: '>';
+      color: var(--amber);
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .nav-links { display: flex; gap: .25rem; list-style: none; align-items: center; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: .4rem .75rem;
+      border-radius: 4px;
+      letter-spacing: .04em;
+      transition: color .2s, background .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--cyan); background: var(--cyan-dim); }
+    .nav-social { display: flex; gap: .75rem; align-items: center; }
+    .nav-social a { color: var(--muted); text-decoration: none; font-size: 1rem; transition: color .2s; }
+    .nav-social a:hover { color: var(--cyan); }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: .5rem;
+    }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 1px; }
+    @media (max-width: 768px) {
+      nav#nav { padding: 0 16px; }
+      .hamburger { display: flex; }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: var(--nav-h);
+        left: 0; right: 0;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        flex-direction: column;
+        padding: 1rem;
+        gap: .25rem;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { width: 100%; display: block; text-align: center; }
+      .nav-social { display: none; }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .75rem 1.75rem;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+    }
+    .btn-outline { background: transparent; color: var(--cyan); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--cyan); background: var(--cyan-dim); transform: translateY(-1px); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--cyan); }
+
+    /* Shared blog pieces */
+    .page {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: calc(var(--nav-h) + 3rem) 2rem 4rem;
+    }
+    .section-tag {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--cyan);
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .section-tag::before { content: '//'; color: var(--muted); }
+    .page-title {
+      font-family: var(--mono);
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+    }
+    .meta { font-family: var(--mono); font-size: .72rem; color: var(--muted); letter-spacing: .03em; }
+    .summary { color: var(--dim); font-size: .95rem; line-height: 1.6; margin: .5rem 0; }
+    .tags { display: flex; flex-wrap: wrap; gap: .35rem; list-style: none; margin-top: .6rem; }
+    .tags li {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--cyan);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: .05rem .45rem;
+    }
+
+    /* Blog index */
+    .featured {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+    .featured-media { display: block; min-height: 240px; text-decoration: none; }
+    .featured-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .featured-body { padding: 1.75rem 1.75rem 1.75rem 1.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .latest { font-family: var(--mono); font-size: .68rem; color: var(--amber); letter-spacing: .2em; text-transform: uppercase; }
+    .featured-title { font-size: 1.35rem; font-weight: 600; line-height: 1.3; margin: .4rem 0 .2rem; }
+    .featured-title a, .row-title a { color: var(--text); text-decoration: none; }
+    .featured-title a:hover, .row-title a:hover { color: var(--cyan); }
+    .title-panel {
+      height: 100%;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.5rem;
+      font-family: var(--mono);
+      background:
+        radial-gradient(circle at 20% 30%, rgba(34,211,238,.18), transparent 55%),
+        linear-gradient(135deg, var(--bg3), var(--bg));
+      border-right: 1px solid var(--border);
+    }
+    .tp-prompt { color: var(--amber); font-size: .85rem; }
+    .tp-slug { color: var(--cyan); font-size: 1.05rem; line-height: 1.4; margin-top: .3rem; overflow-wrap: anywhere; }
+    .tp-host { color: var(--muted); font-size: .7rem; margin-top: .75rem; }
+    .older-label {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: .25rem;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .row:last-child { border-bottom: none; }
+    .row-meta { font-family: var(--mono); font-size: .72rem; color: var(--muted); line-height: 1.6; }
+    .row-title { font-size: 1.05rem; font-weight: 600; line-height: 1.35; }
+    @media (max-width: 720px) {
+      .page { padding: calc(var(--nav-h) + 2rem) 16px 3rem; }
+      .featured { grid-template-columns: 1fr; }
+      .featured-media, .title-panel { min-height: 0; height: 190px; }
+      .title-panel { border-right: none; border-bottom: 1px solid var(--border); }
+      .featured-body { padding: 1.25rem; }
+      .row { gap: .9rem; }
+    }
+
+    /* Post page */
+    .post-layout { display: block; }
+    .post-main { min-width: 0; max-width: 720px; }
+    .crumb { font-family: var(--mono); font-size: .72rem; color: var(--muted); margin-bottom: 1rem; }
+    .crumb a { color: var(--cyan); text-decoration: none; }
+    .post-title { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 600; line-height: 1.25; }
+    .post-subtitle { color: var(--dim); font-style: italic; font-size: 1.05rem; line-height: 1.55; margin: .75rem 0 1rem; }
+    .post-header .meta { margin-top: .75rem; }
+    .post-cover {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin: 1.75rem 0 .5rem;
+      display: block;
+    }
+    .toc-head { font-family: var(--mono); font-size: .65rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-bottom: .75rem; }
+    .toc-list { list-style: none; }
+    .toc-list a {
+      display: block;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .82rem;
+      line-height: 1.35;
+      padding: .3rem 0;
+      transition: color .2s;
+    }
+    .toc-list a:hover, .toc-list a.active { color: var(--cyan); }
+    .toc-list .toc-sub a { padding-left: .9rem; font-size: .76rem; }
+    .toc-desktop { display: none; }
+    .toc-mobile {
+      margin: 1.5rem 0 0;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .75rem 1rem;
+    }
+    .toc-mobile summary { font-family: var(--mono); font-size: .75rem; color: var(--cyan); cursor: pointer; }
+    .toc-mobile .toc-list { margin-top: .5rem; }
+    @media (min-width: 1000px) {
+      .post-layout { display: grid; grid-template-columns: minmax(0, 720px) 220px; gap: 3.5rem; justify-content: space-between; }
+      .toc-desktop {
+        display: block;
+        position: sticky;
+        top: calc(var(--nav-h) + 2rem);
+        align-self: start;
+        max-height: calc(100vh - var(--nav-h) - 4rem);
+        overflow-y: auto;
+        border-left: 1px solid var(--border);
+        padding-left: 1.1rem;
+      }
+      .toc-mobile { display: none; }
+    }
+
+    .prose { margin-top: 1.5rem; }
+    .prose > * + * { margin-top: 1rem; }
+    .prose p, .prose li { color: #c3d0de; font-size: 1rem; line-height: 1.75; }
+    .prose h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-top: 2.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .prose h2::before { content: '## '; color: var(--cyan); font-family: var(--mono); font-size: 1rem; }
+    .prose h3 { font-size: 1.12rem; font-weight: 600; margin-top: 2rem; }
+    .prose h4 { font-size: 1rem; font-weight: 600; margin-top: 1.5rem; }
+    .prose ul, .prose ol { padding-left: 1.4rem; }
+    .prose li + li { margin-top: .35rem; }
+    .prose strong { color: var(--text); }
+    .prose a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(34,211,238,.35); }
+    .prose a:hover { border-bottom-color: var(--cyan); }
+    .prose img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); }
+    .prose hr { border: none; border-top: 1px solid var(--border); margin: 2.75rem 0 0; }
+    .prose hr + h2 { border-top: none; margin-top: 0; }
+    .prose blockquote { border-left: 3px solid var(--amber); padding: .25rem 0 .25rem 1rem; color: var(--dim); }
+    .prose :not(pre) > code {
+      font-family: var(--mono);
+      font-size: .82em;
+      background: var(--bg3);
+      color: var(--amber);
+      padding: .1rem .35rem;
+      border-radius: 3px;
+      overflow-wrap: anywhere;
+    }
+    .code { position: relative; }
+    .code pre {
+      /* System monospace: Space Mono lacks box-drawing glyphs, which breaks ASCII diagrams */
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+      font-size: .8rem;
+      line-height: 1.55;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.1rem;
+      color: var(--dim);
+      overflow-x: auto;
+    }
+    .copy {
+      position: absolute;
+      top: .5rem; right: .5rem;
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .15rem .55rem;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+    }
+    .copy:hover { color: var(--cyan); border-color: var(--cyan); }
+    .table-wrap { overflow-x: auto; }
+    .prose table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+    .prose th {
+      text-align: left;
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--cyan);
+      letter-spacing: .04em;
+      border-bottom: 1px solid var(--border);
+      padding: .55rem .75rem;
+      white-space: nowrap;
+    }
+    .prose td { color: #c3d0de; border-bottom: 1px solid var(--bg3); padding: .55rem .75rem; vertical-align: top; }
+
+    .source {
+      margin-top: 3rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      color: var(--dim);
+      font-size: .92rem;
+    }
+    .source a { font-family: var(--mono); font-size: .8rem; text-decoration: none; overflow-wrap: anywhere; }
+    .back { margin-top: 1.5rem; }
+
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px rgba(34,211,238,.7);
+      z-index: 9999;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav id="nav">
+  <a class="nav-logo" href="/">tim.salvador</a>
+
+  <ul class="nav-links" id="nav-links">
+    <li><a href="/#about">About</a></li>
+    <li><a href="/#competencies">Competencies</a></li>
+    <li><a href="/#experience">Experience</a></li>
+    <li><a href="/#skills">Skills</a></li>
+    <li><a href="/#education">Education</a></li>
+    <li><a href="/blog/" class="active">Blog</a></li>
+    <li><a href="/#contact">Contact</a></li>
+  </ul>
+
+  <div class="nav-social">
+    <a href="https://www.linkedin.com/in/tim-salvador/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+    <a href="https://github.com/tim-salvador/" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    </a>
+    <a href="https://x.com/timsalvador" target="_blank" rel="noopener" aria-label="X (Twitter)" title="X">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+    <a href="https://keybase.io/tsalvador" target="_blank" rel="noopener" aria-label="Keybase" title="Keybase">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M10.976 0C5.66.002 1.34 4.335 1.34 9.655c0 3.38 1.746 6.36 4.397 8.095l-3.29 5.675a.67.67 0 0 0 .583 1.003h.06c.23 0 .437-.116.555-.307l3.27-5.64c1.2.513 2.534.793 3.934.795l.127-.001c5.32 0 9.64-4.333 9.64-9.653S16.296 0 10.976 0zm0 17.657l-.107.001c-1.12 0-2.193-.232-3.168-.651l2.12-3.656a.67.67 0 0 0-.247-.916.67.67 0 0 0-.916.247l-2.119 3.656C4.786 15.228 3.58 13.157 3.58 9.655c0-4.08 3.316-7.397 7.396-7.397S18.372 5.575 18.372 9.655c0 4.079-3.315 7.395-7.396 7.402z"/></svg>
+    </a>
+    <a href="mailto:getintouch@timsalvador.com" class="btn btn-outline" style="font-size:.72rem;padding:.5rem 1rem;">Get in Touch</a>
+  </div>
+
+  <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<main class="page">
+  <div class="post-layout">
+    <div class="post-main">
+      <header class="post-header">
+        <nav class="crumb" aria-label="Breadcrumb"><a href="/blog/">blog</a> / reversing-the-thotcon-0xc-badge</nav>
+        <h1 class="post-title">Three Flags, One Decoy, and an ESP32: Reverse Engineering a Thotcon 0xC Badge</h1>
+        <p class="post-subtitle">I dumped a conference badge&#39;s flash, decompiled its Xtensa firmware, stood up a fake conference Wi-Fi network to talk to it, and found that its headline `flag` command was built to lie to me.</p>
+        <div class="meta">2026-11-12 &middot; 16 min read &middot; Tim Salvador</div>
+        <ul class="tags"><li>reverse-engineering</li><li>esp32</li><li>firmware</li><li>hardware</li></ul>
+      </header>
+      <details class="toc-mobile"><summary>On this page</summary><ul class="toc-list"><li><a href="#tldr">TL;DR</a></li><li><a href="#the-setup">The setup</a></li><li><a href="#act-1-it-shows-up-as-ttyusb0-passive-recon">Act 1: It shows up as ttyUSB0 (passive recon)</a></li><li><a href="#act-2-fingerprint-and-dump-read-only-then-verify">Act 2: Fingerprint and dump (read-only, then verify)</a></li><li><a href="#act-3-carve-and-triage">Act 3: Carve and triage</a></li><li><a href="#act-4-the-flag-command-that-always-lies">Act 4: The flag command that always lies</a></li><li><a href="#act-5-the-konami-code-in-the-touch-pads">Act 5: The Konami code in the touch pads</a></li><li><a href="#act-6-faking-the-conference-network">Act 6: Faking the conference network</a></li><li><a href="#act-7-ir-lock-on-and-a-bucket-that-no-longer-exists">Act 7: IR lock-on and a bucket that no longer exists</a></li><li><a href="#the-architecture">The architecture</a></li><li><a href="#the-gotchas-that-cost-me-time-collected">The gotchas that cost me time (collected)</a></li><li><a href="#the-scripts">The scripts</a></li><li><a href="#would-i-recommend-it">Would I recommend it?</a></li></ul></details>
+      <img class="post-cover" src="images/cover.jpg" alt="A Thotcon 0xC badge connected to a laptop over a USB-serial cable, with a terminal showing the badge boot banner and the line &quot;uart flag: flag{welcome_to_the_8bit_world}&quot;.">
+      <article class="prose">
+<p>A friend handed me a Thotcon 0xC badge and the challenge that comes with every good conference badge: find the flags. I had no documentation, no source, and no idea what was on the board beyond a USB-serial cable that enumerated as <code>/dev/ttyUSB0</code>. This is the full account of taking it apart in software, from the first passive listen on the serial line to a complete map of every subsystem: the UART console, a capacitive-touch game, a Wi-Fi/IRC client, and an infrared combat system. I pulled three flags, and the most interesting one came from a command that is engineered never to give it to you. The scripts I built along the way are in this repo.</p>
+<h2 id="tldr">TL;DR</h2>
+<p>The badge is an <strong>ESP32-D0WDQ6</strong> (dual-core Xtensa LX6, 4 MB flash) running an Arduino-ESP32 firmware. The honest way in is the boring, correct one: identify the chip from its boot banner, dump the flash read-only with <code>esptool</code>, verify the dump byte-for-byte, then do every bit of analysis offline on the copy. The one surprise that matters: the badge&#39;s <code>flag</code> command is a decoy. Typing <code>flag</code> always returns <code>ERR: Permission denied!</code>, and no developer mode, IR code, or network trick changes that. The real flag is assembled at runtime inside a handler the dispatcher is hardcoded never to call, so the only way to read it is to decompile the Xtensa code.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Where it lives</th>
+<th>How to get it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>flag{welcome_to_the_8bit_world}</code></td>
+<td>UART boot banner</td>
+<td>Read the serial console at boot</td>
+</tr>
+<tr>
+<td><code>flag{lets_fight!}</code></td>
+<td>Touch buttons</td>
+<td>Enter the Konami code: <code>Up Up Down Down Left Right Left Right Select</code></td>
+</tr>
+<tr>
+<td><code>flag{byte_fu}</code></td>
+<td>The <code>flag</code> command&#39;s dead-code handler</td>
+<td>Decompile it; the command itself always refuses</td>
+</tr>
+</tbody></table></div>
+<p>This writeup is both the story (including the detours, because the detours are where the real knowledge is) and a runbook. The scripts and the full findings are at the end.</p>
+<hr>
+<h2 id="the-setup">The setup</h2>
+<ul>
+<li><strong>Host:</strong> Linux workstation, CLI-first, <code>rizin</code> and Python available.</li>
+<li><strong>Target:</strong> Thotcon 0xC badge. ESP32-D0WDQ6 rev v1.0, 26 MHz crystal, 4 MB Winbond W25Q32 flash (<code>ef:4016</code>), MAC <code>7c:9e:bd:79:dd:58</code>. FTDI FT231X USB-UART bridge (<code>0403:6015</code>) on <code>/dev/ttyUSB0</code>.</li>
+<li><strong>Goal:</strong> Find every flag, and understand every subsystem well enough to explain how it works.</li>
+<li><strong>Constraints:</strong> Read-only on the hardware until I have a verified dump. Reproducible commands. No guessing where the firmware can answer.</li>
+</ul>
+<p>Conference badges are a near-perfect reverse-engineering target: small enough to fully understand, deliberately seeded with puzzles, and built by people who expect you to try. The only rule I set myself was the one that matters on any device you want to keep working: never write to it before I have a dump I can trust.</p>
+<hr>
+<h2 id="act-1-it-shows-up-as-ttyusb0-passive-recon">Act 1: It shows up as ttyUSB0 (passive recon)</h2>
+<p>Before sending a single byte, I asked the kernel what it had already learned.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">udevadm info -q property -n /dev/ttyUSB0 | grep -E &#39;ID_(VENDOR|MODEL|SERIAL)&#39;
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>ID_MODEL=FT231X_USB_UART
+ID_VENDOR_ID=0403
+ID_MODEL_ID=6015
+</code></pre></div>
+<p>An FTDI FT231X. That tells me there&#39;s a separate USB-to-UART bridge and the real MCU is behind it. Next I listened. Many embedded devices chatter on their own, and that chatter is free intelligence.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">python3 -c &quot;
+import serial,time
+s=serial.Serial(&#39;/dev/ttyUSB0&#39;,115200,timeout=0.2)
+buf=b&#39;&#39;; end=time.time()+5
+while time.time()&lt;end: buf+=s.read(4096)
+print(repr(buf[:80]))&quot;
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>b&#39;..........&#39;
+</code></pre></div>
+<p>A <code>.</code> roughly every half-second: a heartbeat. 115200 was clearly right (clean ASCII, regular timing). So the firmware is alive and idle-printing. Now the question was how to make it talk back. I sent a carriage return, got nothing, and sent <code>help</code> terminated with <code>\r</code>, still nothing. Then I sent a bare newline, and the badge answered in a way I did not expect:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>ets Jun  8 2016 00:22:57
+rst:0x8 (TG1WDT_SYS_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+...
+</code></pre></div>
+<p>That is the ESP32 boot ROM. My malformed input had tripped a watchdog and rebooted the chip, and the reboot told me two things at once: the MCU is an <strong>ESP32</strong>, and the console processes commands on <code>\n</code>, not <code>\r</code>. The <code>\r</code> I had been sending was being ignored.</p>
+<p><strong>Lesson #1:</strong> Listen before you speak, and read the accidents. I learned the chip family and the line terminator from output the device produced on its own and from a crash I caused by mistake, before I had any idea what I was looking at. On an unknown target, idle heartbeats, boot banners, and self-inflicted resets are the cheapest reconnaissance you will ever get.</p>
+<hr>
+<h2 id="act-2-fingerprint-and-dump-read-only-then-verify">Act 2: Fingerprint and dump (read-only, then verify)</h2>
+<p>With <code>\n</code> as the terminator, the console came to life, but first I wanted the chip&#39;s full identity and a copy of its flash. <code>esptool</code> speaks the ESP32 download protocol over the same UART, and the FT231X&#39;s DTR/RTS lines are wired to the chip&#39;s reset and boot pins, so it can enter download mode on its own.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">esptool --port /dev/ttyUSB0 flash-id
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>Chip type:          ESP32-D0WDQ6 (revision v1.0)
+Crystal frequency:  26MHz
+MAC:                7c:9e:bd:79:dd:58
+Detected flash size: 4MB
+Manufacturer: ef   Device: 4016
+</code></pre></div>
+<p>A 26 MHz crystal, which is slightly unusual (most ESP32 boards use 40 MHz) and explains something I had glossed over: the very first boot-ROM banner looked garbled at 115200. The ROM computes its own UART divisor assuming a 40 MHz crystal, so on a 26 MHz board the ROM&#39;s own prints come out at the wrong baud. The application&#39;s <code>Serial</code> output is clean because the app sets the baud correctly.</p>
+<p>Dumping came with one speed lesson. At 460800 the read corrupted partway through:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>ERROR: A fatal error occurred: Corrupt data, expected 0x1000 bytes but received 0xf03 bytes.
+</code></pre></div>
+<p>That is the classic symptom of a USB-UART link that cannot keep up. I dropped to 115200, which is slow (about seven minutes for 4 MB) but solid, and then proved the copy was perfect before trusting it.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">esptool --port /dev/ttyUSB0 --baud 115200 read-flash 0x0 0x400000 dump/flash.bin
+esptool --port /dev/ttyUSB0 --baud 115200 verify-flash 0x0 dump/flash.bin
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>Read 4194304 bytes ... to &#39;dump/flash.bin&#39;.
+Verifying 0x400000 (4194304) bytes ... Verification successful (digest matched).
+</code></pre></div>
+<p><code>verify-flash</code> re-reads the chip and compares it to my file; it does not write anything. A match (md5 <code>267eeb22b7347d95c12803129fae9637</code>) meant I could put the badge down and do everything else offline.</p>
+<p><strong>Lesson #2:</strong> A dump you have not verified is a liability, not an asset. The faster read that silently drops bytes is worse than the slow one that finishes, because you will build hours of analysis on top of a hole you do not know is there. Read slow, verify, then never touch the hardware again until you have a reason.</p>
+<hr>
+<h2 id="act-3-carve-and-triage">Act 3: Carve and triage</h2>
+<p>My first instinct on any firmware blob is <code>binwalk</code>, which scans for known signatures and labels what it finds. On this image it came back thin:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>DECIMAL     HEXADECIMAL   DESCRIPTION
+4196        0x1064        Unix path: .../esp32-arduino-lib-builder/.../bootloader_init.
+4464        0x1170        Unix path: .../esp32-arduino-lib-builder/.../bootloader_random
+110027      0x1ADCB       Neighborly text, &quot;neighbor entry&quot;
+139096      0x21F58       SHA256 hash constants, little endian
+1420631     0x15AD57      Neighborly text, &quot;neighbor entry&quot;
+1449704     0x161EE8      SHA256 hash constants, little endian
+</code></pre></div>
+<p>Six hits, and not one is a partition table or an app header. That is a limitation worth understanding, not a binwalk failure: it only recognizes formats in its signature database, and ESP32&#39;s app-image and partition-table layouts are not in it. So on ESP32 it finds generic things: two build-machine path strings compiled into the bootloader, the 64 round constants that every SHA-256 implementation contains, and a couple of false-positive text matches. Its silence on the real structure is the signal to switch methods.</p>
+<p>But the hits are still worth aligning, and &quot;aligning&quot; is just placing each offset in the partition it falls in. Do that and a pattern appears:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>binwalk offset</th>
+<th>Lands in</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0x1064, 0x1170</td>
+<td>bootloader</td>
+<td>build path strings</td>
+</tr>
+<tr>
+<td>0x1ADCB, 0x21F58</td>
+<td>app0</td>
+<td>false positive, SHA-256 constants</td>
+</tr>
+<tr>
+<td>0x15AD57, 0x161EE8</td>
+<td>app1</td>
+<td>the same two, again</td>
+</tr>
+</tbody></table></div>
+<p>The app0 hits reappear in app1, about <code>0x140000</code> later:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>0x15AD57 - 0x1ADCB = 0x13FF8C   (~0x140000)
+0x161EE8 - 0x21F58 = 0x13FF90   (~0x140000)
+</code></pre></div>
+<p><code>0x140000</code> is the app-slot size, so binwalk&#39;s duplicated hits are quietly telling me the firmware sits in two OTA slots, without ever labeling a partition. The mirror is not exact, though, and the two slots have different checksums:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>ad92287902e91431836a8a912ce528c4  app0.bin
+ec3dc8270caf2d29c4687990c15c8a55  app1.bin
+</code></pre></div>
+<p>So they are sibling builds, near-identical but not byte-for-byte. That nuance came from aligning and comparing, not from any label binwalk printed.</p>
+<p><strong>Lesson #3:</strong> binwalk aligns the image to what its database already knows; your job is to align its hits to the map you build yourself. Where it is silent, the offsets it does report still carry structure: a signature that repeats at a fixed stride is duplicated content, and the stride is the size of the thing being duplicated.</p>
+<p>To get the real layout I went to the source of truth. Once the chip is identified as ESP32, its flash layout is a documented convention: the partition table sits at a fixed offset <code>0x8000</code>, and each 32-byte entry starts with the magic <code>0xAA 0x50</code>. If I had not known that, I could find it the way binwalk does but with the right signature: search the whole image for <code>0xAA50</code> and look for a regular stride.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">python3 -c &quot;
+d=open(&#39;dump/flash.bin&#39;,&#39;rb&#39;).read(); i=0
+while True:
+    i=d.find(b&#39;\xaa\x50&#39;,i)
+    if i&lt;0: break
+    print(&#39;0x%06x&#39;%i); i+=2&quot;
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>0x001714
+0x008000
+0x008020
+0x008040
+0x008060
+0x008080
+...
+</code></pre></div>
+<p>Five hits at <code>0x8000</code>, each exactly <code>0x20</code> (32) bytes apart: that regular stride is the partition table announcing itself. The lone hit at <code>0x1714</code> is a coincidental byte pair in code, not an entry, because it stands alone. Parsing those entries gave the map:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Type</th>
+<th>Offset</th>
+<th>Size</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>nvs</td>
+<td>nvs</td>
+<td>0x9000</td>
+<td>20 KB</td>
+<td>settings</td>
+</tr>
+<tr>
+<td>otadata</td>
+<td>data</td>
+<td>0xe000</td>
+<td>8 KB</td>
+<td>selects active app (app0)</td>
+</tr>
+<tr>
+<td>app0</td>
+<td>ota_0</td>
+<td>0x10000</td>
+<td>1280 KB</td>
+<td>the image I analyzed</td>
+</tr>
+<tr>
+<td>app1</td>
+<td>ota_1</td>
+<td>0x150000</td>
+<td>1280 KB</td>
+<td>second OTA slot (sibling build)</td>
+</tr>
+<tr>
+<td>spiffs</td>
+<td>spiffs</td>
+<td>0x290000</td>
+<td>1472 KB</td>
+<td>100% erased (all <code>0xFF</code>)</td>
+</tr>
+</tbody></table></div>
+<p>The SPIFFS filesystem was completely empty, which told me every asset, string, and secret lives in the code, not in a filesystem I could just read out. The app image&#39;s descriptor identified it as an Arduino-ESP32 build on ESP-IDF v4.4.4 from April 2023. Then the fastest possible content check, <code>strings</code>, immediately paid off:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">strings -n 4 dump/parts/app0.bin | grep -oE &#39;flag\{[^}]*\}&#39; | sort -u
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>flag{lets_fight!}
+flag{welcome_to_the_8bit_world}
+</code></pre></div>
+<p>Two flags in plaintext. But the same scan also turned up a bare <code>flag{</code> prefix with no closing brace near it, and the strings <code>byte_fu</code>, <code>Developer Mode:</code>, and <code>ERR: Permission denied!</code>. A lone <code>flag{</code> with no body is a tell: at least one flag is <strong>assembled at runtime</strong> from pieces, which means it is a decompilation target, not a thing <code>grep</code> will ever find.</p>
+<p><strong>Lesson #4:</strong> <code>strings</code> is triage, not an answer. A flag prefix with no flag after it is the firmware telling you where to point the disassembler. The absence of a complete string is itself a finding.</p>
+<hr>
+<h2 id="act-4-the-flag-command-that-always-lies">Act 4: The flag command that always lies</h2>
+<p>Driving the live console, the <code>help</code> command handed me something generous: the entire command table, including each handler&#39;s address in memory.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>cmd: flag   - desc: print flag        - cb: 0x400D3450 - hidden: 1
+cmd: ircode - desc: print last IR code - cb: 0x400D3434 - hidden: 1
+...
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>flag   → ERR: Permission denied!
+ircode → Last Code Received: 0
+</code></pre></div>
+<p>So <code>flag</code> refuses. My first theory was a developer-mode gate, but the boot banner literally prints <code>Developer Mode: 1</code>, and <code>test</code> and <code>ircode</code> are also marked <code>hidden: 1</code> yet run fine. Hidden was not the gate. The answer had to be in the code.</p>
+<p>The ESP32 is Xtensa LX6, which Ghidra&#39;s raw loader would not take, so I used <code>rizin</code>, which has an Xtensa plugin. The app image is not an ELF, so I mapped each segment at its real load address in a small reusable script, which lets pointer loads resolve to the strings they reference:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>om 3 0x400d0020 0x9034c 0x030020 rx seg_code
+om 3 0x3f400020 0x20454 0x20     r  seg_rodata
+e asm.arch=xtensa
+e asm.cpu=esp32
+</code></pre></div>
+<p>Decompiling the <code>flag</code> handler at <code>0x400d3450</code> showed it building a <code>std::string</code> out of three pieces, <code>&quot;flag{&quot;</code>, <code>&quot;byte_fu&quot;</code>, and <code>&quot;}&quot;</code>, with no obfuscation and no condition. It just constructs <code>flag{byte_fu}</code> and returns it. That is the whole handler. Which raised the real question: if the handler unconditionally builds the flag, why does typing <code>flag</code> return a permission error?</p>
+<p>Because the dispatcher never calls it. In the command-match loop, after confirming the typed word matches a registered command, there is a second, hardcoded comparison against the literal string <code>&quot;flag&quot;</code>:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>0x400d38e9  beqz a10, . +0xd0   → 0x400d39b9   &quot;ERR: Permission denied!&quot;
+</code></pre></div>
+<p><code>a10</code> there is the result of comparing your input against the constant <code>&quot;flag&quot;</code>. Any command whose name is exactly <code>flag</code> is routed straight to the deny block before its handler can run. The <code>flag{byte_fu}</code> builder is dead code at runtime; its only reference in the whole binary is the command table, and the one path that would reach it is intercepted. No developer mode, no IR code, no network event changes this. The command is a troll, and the author left a hint in the flag itself: byte-fu, the thing you need to read it.</p>
+<p><strong>Lesson #5:</strong> The obvious interface is sometimes a trap, and the only way to know is to read both sides. The handler and the dispatcher told two different stories; the truth was in how they connected. If I had trusted the prompt, or only read the handler, I would have concluded either that the flag was unreachable or that it was free. It was neither: it was reachable only by reverse engineering, which is the entire point.</p>
+<hr>
+<h2 id="act-5-the-konami-code-in-the-touch-pads">Act 5: The Konami code in the touch pads</h2>
+<p><code>flag{lets_fight!}</code> was already in plaintext, next to the string <code>Hadouken!</code> and, a few bytes further, the button names <code>Down</code>, <code>Left</code>, <code>Up</code>, <code>Right</code>, <code>Select</code>. Right before the flag string sat a 9-byte array:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">rizin ... -c &quot;px 16 @ 0x3f401f5c&quot; dump/parts/app0.bin
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>0x3f401f5c  02 02 00 00 01 03 01 03 04   ...
+</code></pre></div>
+<p>The button table nearby defined each button&#39;s index: <code>Down=0, Left=1, Up=2, Right=3, Select=4</code>. Decoding the array with that mapping gives <code>Up Up Down Down Left Right Left Right Select</code>: the Konami code. The comparator at <code>0x400d5478</code> confirmed it, looping exactly nine times over a circular buffer of the last nine presses and printing the flag on a match. So <code>flag{lets_fight!}</code> is a physical easter egg: enter the Konami code on the capacitive pads (Up is GPIO15, Down is GPIO12, Left is GPIO2, Right is GPIO13, Select is GPIO14) and the badge prints it.</p>
+<p><strong>Lesson #6:</strong> A fixed array in read-only data next to a reward string, plus a loop that reads your input against it, is the shape of a secret combo. Once you recognize the pattern you stop decompiling and start decoding: find the array, find the index mapping the firmware uses, and translate.</p>
+<hr>
+<h2 id="act-6-faking-the-conference-network">Act 6: Faking the conference network</h2>
+<p>The badge has a Wi-Fi client it calls BadgeNET. From the firmware I reversed the whole protocol: it joins an open access point named <code>THOTCON-Open</code>, connects over IRC to a host named <code>TC0xCBADGE</code> on port 6667, and auto-joins two channels with keys, <code>#snowfield</code> (key <code>RAR</code>) and <code>#battles</code> (key <code>CONTRA</code>). It then behaves as a chat-bot, scanning incoming messages for commands like <code>!firmware</code>, <code>!boot</code>, and <code>!update</code>. None of that infrastructure exists anymore, so the feature looks dead. I decided to bring it back to life by pretending to be the conference.</p>
+<p>I stood up an open AP named <code>THOTCON-Open</code> on a USB Wi-Fi dongle using NetworkManager&#39;s shared mode, pointed the badge&#39;s hardcoded hostname at my machine with a dnsmasq override (<code>address=/TC0xCBADGE/10.42.0.1</code>), and wrote a small IRC server that implements just enough of the protocol for the badge to register and join, logging everything it says. The badge took the bait:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>Connecting to THOTCON-Open
+WiFi connected
+IP address: 10.42.0.27
+BadgeBattles Soldier TC58DD79 locked and loaded
+Attempting BadgeNET connection
+</code></pre></div>
+<p>It associated, pulled an IP, resolved my fake server, and tried to connect. Then it hit a wall I did not expect, and the wall was physics.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>Connecting to THOTCON-Open
+.
+Brownout detector was triggered
+ets Jun  8 2016 00:22:57
+rst:0xc (SW_CPU_RESET)
+</code></pre></div>
+<p>The ESP32&#39;s Wi-Fi radio pulls 300 to 500 mA in bursts, and the FT231X&#39;s USB port could not supply it. Every time the radio powered up, the badge browned out and reset. It would occasionally get far enough to grab an IP on a second boot, but it could never hold the TCP session long enough to finish the IRC handshake. I confirmed the server itself was reachable and that a host firewall (<code>ufw</code>) had also been silently dropping port 6667, fixed that, and the remaining blocker was purely power.</p>
+<p><strong>Lesson #7:</strong> When a networked embedded device flaps, suspect power before protocol. I spent real effort confirming DNS, the firewall, and the server were correct, and all three were. The actual fault was that a Wi-Fi radio and a bus-powered USB-UART bridge are a bad match. This is not fixable in software: it needs a powered USB hub or external supply to the badge, with USB carrying only serial. The emulation stack was right; the amps were not there.</p>
+<hr>
+<h2 id="act-7-ir-lock-on-and-a-bucket-that-no-longer-exists">Act 7: IR lock-on and a bucket that no longer exists</h2>
+<p>Two subsystems remained. The first was the infrared &quot;Lock-On.&quot; I had hoped a specific IR code might unlock the <code>flag</code> command, but the firmware was clear: the IR path is laser-tag combat, nothing more. The receive task decodes a 32-bit NEC frame, validates its checksum, and on a valid frame counts exactly one point of damage, reporting <code>received 1 damage from TC...</code> to the <code>#battles</code> channel. Every valid code is worth one damage; there is no magic value and no IR-gated flag. Badges shoot each other with IR and tally the hits over IRC.</p>
+<p>The second was the OTA updater behind the <code>!update</code> command, which pulls firmware over HTTPS from an Amazon S3 bucket. I checked whether that bucket still existed:</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code class="language-bash">curl -s &quot;https://tc0xb.s3.us-east-2.amazonaws.com/&quot;
+</code></pre></div>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>&lt;Error&gt;&lt;Code&gt;NoSuchBucket&lt;/Code&gt;&lt;Message&gt;The specified bucket does not exist&lt;/Message&gt;&lt;/Error&gt;
+</code></pre></div>
+<p>The bucket is gone, decommissioned after the conference. Worth noting for anyone with one of these badges on a live network: the bucket name is now unclaimed, which is a latent supply-chain takeover vector. A third party who registered <code>tc0xb</code> in <code>us-east-2</code> could serve firmware to any badge that runs <code>!update</code> and trusts the response. I did not act on that; registering someone else&#39;s namespace on live AWS is not mine to do. But it is the kind of finding that outlives the event.</p>
+<p><strong>Lesson #8:</strong> Reverse engineering an abandoned device surfaces security debt that nobody is maintaining anymore. A hardcoded update endpoint is fine while the vendor owns it and a liability forever after they let it lapse. The firmware does not know the difference; it will trust whatever answers at that name.</p>
+<hr>
+<h2 id="the-architecture">The architecture</h2>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>   Badge (ESP32-D0WDQ6, 4MB flash)
+   +---------------------------------------------------+
+   |  UART CLI        touch game       IR (NEC)         |
+   |  8 commands      Konami combo     laser-tag        |
+   |  flag=decoy      flag{lets_fight} combat, no flag  |
+   |                                                    |
+   |  BadgeNET: Wi-Fi client -&gt; IRC TC0xCBADGE:6667     |
+   |            #snowfield(RAR)  #battles(CONTRA)       |
+   |            !update -&gt; S3 bucket tc0xb (now gone)   |
+   +---------------------------------------------------+
+         |  FT231X USB-UART (/dev/ttyUSB0)
+         v
+   Workstation
+   +---------------------------------------------------+
+   |  esptool  -&gt; dump + verify 4MB flash              |
+   |  rizin    -&gt; map segments, decompile Xtensa       |
+   |  fake AP  -&gt; THOTCON-Open + dnsmasq(TC0xCBADGE)    |
+   |  IRC srv  -&gt; badgenet_server.py on :6667          |
+   +---------------------------------------------------+
+</code></pre></div>
+<hr>
+<h2 id="the-gotchas-that-cost-me-time-collected">The gotchas that cost me time (collected)</h2>
+<p><strong>The console ignores <code>\r</code>.</strong> Symptom: <code>help\r</code> produces nothing, so the device looks dead or the baud looks wrong. Cause: the firmware&#39;s line reader only acts on <code>\n</code>. Fix: send <code>\n</code> (or test all three terminators early). On an unknown console, the wrong line ending is indistinguishable from a broken connection.</p>
+<p><strong>The boot banner looks like garbage.</strong> Symptom: the first lines after reset are unreadable at 115200, then clean text follows. Cause: a 26 MHz crystal, where the ESP32 ROM mis-sets its own UART baud assuming 40 MHz; the application fixes it. Fix: ignore the ROM garble and read the application output, or match the ROM&#39;s actual baud if you need those lines.</p>
+<p><strong>Fast flash reads corrupt on a flaky link.</strong> Symptom: <code>Corrupt data, expected 0x1000 bytes but received 0xf03</code>. Cause: the USB-UART link cannot sustain 460800 for a long read. Fix: drop to 115200 and verify. Slower and complete beats fast and holed.</p>
+<p><strong>The AP works but the badge never connects.</strong> Symptom: the badge gets a DHCP lease but your server sees nothing. Cause, in my case, two stacked: the host firewall (<code>ufw</code>) dropped the service port, and underneath that, Wi-Fi brownouts reset the badge mid-handshake. Fix: open the port on the AP interface, then fix power. Check the firewall before you blame the firmware.</p>
+<hr>
+<h2 id="the-scripts">The scripts</h2>
+<p>The repo includes the tooling I built, each piece shaped by a lesson above.</p>
+<div class="code"><button class="copy" type="button">copy</button><pre><code>tools/
+  baudscan.py          passive baud discovery (optionally resets to catch a banner)
+  serial_console.py    console driver: filters the heartbeat, tries line terminators
+  badgenet_server.py   minimal IRC server that the badge will register and join against
+analysis/
+  map.rz               rizin segment map (load addresses) reused for every disassembly
+</code></pre></div>
+<p>The console driver exists because of a bug I wrote first: a naive &quot;read until quiet&quot; loop never sees quiet when the device emits a heartbeat every half-second, so it hangs forever. The fix is to treat only non-heartbeat bytes as activity worth waiting on, and to cap the total wait. That one correction is the difference between a tool that works on badges and one that hangs on them, so it is baked in.</p>
+<p>I also turned the whole process into a reusable, architecture-agnostic reverse-engineering skill, because the next badge will have a different chip and different commands, and the method generalizes even when the specifics do not.</p>
+<hr>
+<h2 id="would-i-recommend-it">Would I recommend it?</h2>
+<p>If you have a conference badge and a free weekend, yes, without reservation. It is one of the best ways to practice end-to-end reverse engineering on something bounded and intentional.</p>
+<p><strong>Good at:</strong> teaching the full loop. Interface identification, safe firmware extraction, static decompilation, dynamic interaction, and protocol emulation, all on one small device where you can actually finish and understand everything.</p>
+<p><strong>Bad at:</strong> cooperating on bus power. Anything that lights up the radio needs a real supply, and the badge will reset in your face until you give it one.</p>
+<p>The lesson that outlived the badge is the one from the <code>flag</code> command. The most interesting secret on a device is often not behind the control that claims to guard it. It is in the gap between what a component does and whether anything ever calls it. The prompt said no; the silicon said <code>flag{byte_fu}</code>. On any sufficiently interesting target, trust the silicon.</p>
+      </article>
+      <aside class="source">
+        Source, scripts and notes live in the project repo.<br>
+        <a href="https://github.com/tim-salvador/reversing-the-thotcon-0xc-badge">github.com/tim-salvador/reversing-the-thotcon-0xc-badge &rarr;</a>
+      </aside>
+      <a class="btn btn-outline back" href="/blog/">&larr; Back to Blog</a>
+    </div>
+    <aside class="toc-desktop" aria-label="On this page"><div class="toc-head">On this page</div><ul class="toc-list"><li><a href="#tldr">TL;DR</a></li><li><a href="#the-setup">The setup</a></li><li><a href="#act-1-it-shows-up-as-ttyusb0-passive-recon">Act 1: It shows up as ttyUSB0 (passive recon)</a></li><li><a href="#act-2-fingerprint-and-dump-read-only-then-verify">Act 2: Fingerprint and dump (read-only, then verify)</a></li><li><a href="#act-3-carve-and-triage">Act 3: Carve and triage</a></li><li><a href="#act-4-the-flag-command-that-always-lies">Act 4: The flag command that always lies</a></li><li><a href="#act-5-the-konami-code-in-the-touch-pads">Act 5: The Konami code in the touch pads</a></li><li><a href="#act-6-faking-the-conference-network">Act 6: Faking the conference network</a></li><li><a href="#act-7-ir-lock-on-and-a-bucket-that-no-longer-exists">Act 7: IR lock-on and a bucket that no longer exists</a></li><li><a href="#the-architecture">The architecture</a></li><li><a href="#the-gotchas-that-cost-me-time-collected">The gotchas that cost me time (collected)</a></li><li><a href="#the-scripts">The scripts</a></li><li><a href="#would-i-recommend-it">Would I recommend it?</a></li></ul></aside>
+  </div>
+</main>
+
+<footer>
+  <a href="/">www.timsalvador.com</a> &nbsp;·&nbsp; Chicago, IL &nbsp;·&nbsp; getintouch@timsalvador.com
+</footer>
+
+<script>
+  /* Hamburger (same behavior as the homepage) */
+  const ham = document.getElementById('hamburger');
+  const navLinks = document.getElementById('nav-links');
+  ham.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    ham.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+  /* Reading progress bar */
+  const progress = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (max > 0 ? window.scrollY / max * 100 : 0) + '%';
+  }, { passive: true });
+
+  /* Copy buttons on code blocks */
+  document.querySelectorAll('.code .copy').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const code = btn.parentElement.querySelector('code');
+      try {
+        await navigator.clipboard.writeText(code.innerText);
+        btn.textContent = 'copied';
+      } catch {
+        btn.textContent = 'failed';
+      }
+      setTimeout(() => { btn.textContent = 'copy'; }, 1500);
+    });
+  });
+
+  /* Highlight the section being read in the table of contents */
+  const tocLinks = document.querySelectorAll('.toc-desktop a');
+  const byId = new Map([...tocLinks].map(a => [a.getAttribute('href').slice(1), a]));
+  const headings = [...document.querySelectorAll('.prose h2[id], .prose h3[id]')].filter(h => byId.has(h.id));
+  let ticking = false;
+  const updateToc = () => {
+    ticking = false;
+    const line = window.innerHeight * 0.25;
+    let current = headings[0];
+    for (const h of headings) {
+      if (h.getBoundingClientRect().top <= line) current = h;
+      else break;
+    }
+    if (current) tocLinks.forEach(a => a.classList.toggle('active', a === byId.get(current.id)));
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(updateToc); }
+  }, { passive: true });
+  updateToc();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4df5249156b746839db6e913ec843511"}'></script>
+</body>
+</html>
